@@ -32,6 +32,40 @@ const ScrollToTop = () => {
   return null;
 };
 
+// Layout wrapper that shows Header/Footer for non-admin routes
+const MainLayout = () => (
+  <div className="min-h-screen flex flex-col">
+    <Header />
+    <main className="flex-1">
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </main>
+    <Footer />
+    <CartDrawer />
+  </div>
+);
+
+const AppRoutes = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname === "/admin";
+
+  return isAdmin ? (
+    <Routes>
+      <Route path="/admin" element={<Admin />} />
+    </Routes>
+  ) : (
+    <MainLayout />
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -41,24 +75,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <main className="flex-1">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/product/:id" element={<ProductDetails />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/account" element={<Account />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <Footer />
-              <CartDrawer />
-            </div>
+            <AppRoutes />
           </BrowserRouter>
         </CartProvider>
       </AuthProvider>
