@@ -1,4 +1,9 @@
 import categoryMen from "@/assets/category-men.jpg";
+import categoryWomen from "@/assets/category-women.jpg";
+import categoryShoes from "@/assets/category-shoes.jpg";
+import categoryBags from "@/assets/category-bags.jpg";
+import categoryJewelry from "@/assets/category-jewelry.jpg";
+import categoryKids from "@/assets/category-kids.jpg";
 
 // Re-export Product interface from the hook for backwards compatibility
 export type { Product } from "@/hooks/useProducts";
@@ -14,7 +19,7 @@ export const categories: Category[] = [
   {
     id: "women",
     name: "Women's Fashion",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop",
+    image: categoryWomen,
     subcategories: ["Dresses", "Tops", "Pants", "Skirts", "Jackets", "Accessories"],
   },
   {
@@ -26,25 +31,25 @@ export const categories: Category[] = [
   {
     id: "shoes",
     name: "Shoes",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
+    image: categoryShoes,
     subcategories: ["Heels", "Sneakers", "Boots", "Flats", "Sandals"],
   },
   {
     id: "bags",
     name: "Bags & Purses",
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=400&fit=crop",
+    image: categoryBags,
     subcategories: ["Handbags", "Clutches", "Backpacks", "Totes", "Wallets"],
   },
   {
     id: "jewelry",
     name: "Jewelry",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop",
+    image: categoryJewelry,
     subcategories: ["Necklaces", "Earrings", "Bracelets", "Rings", "Watches"],
   },
   {
     id: "kids",
     name: "Kids' Clothing",
-    image: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400&h=400&fit=crop",
+    image: categoryKids,
     subcategories: ["Boys", "Girls", "Babies", "Accessories"],
   },
 ];
