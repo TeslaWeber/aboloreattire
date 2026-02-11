@@ -47,7 +47,7 @@ const Footer = () => {
               Discover luxury fashion, accessories, and beauty products curated for the modern connoisseur.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://www.facebook.com/share/16t27kaxMC/?mibextid=qi2Omg" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
               <a 
