@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
+import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
@@ -54,6 +55,7 @@ const MainLayout = () => (
     </main>
     <Footer />
     <CartDrawer />
+    <CookieConsent />
   </div>
 );
 
