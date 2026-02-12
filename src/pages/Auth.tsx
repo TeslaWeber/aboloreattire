@@ -139,6 +139,12 @@ const Auth = () => {
             title: "Welcome to Abolore Couture!",
             description: "You have successfully signed in. Enjoy your shopping experience.",
           });
+          // Navigate immediately after successful sign-in
+          if (isAdminRoute) {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
         }
       }
     } catch (err) {
