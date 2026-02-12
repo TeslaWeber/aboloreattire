@@ -20,7 +20,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { categories } from "@/data/products";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Loader2, Wand2 } from "lucide-react";
+import ImageTransformDialog from "./ImageTransformDialog";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -38,6 +39,8 @@ const ProductFormDialog = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [transformDialogOpen, setTransformDialogOpen] = useState(false);
+  const [transformingImageIndex, setTransformingImageIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -397,13 +400,26 @@ const ProductFormDialog = ({
                         alt={`Product image ${index + 1}`}
                         className="w-full h-full object-cover rounded-lg"
                       />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                      <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTransformingImageIndex(index);
+                            setTransformDialogOpen(true);
+                          }}
+                          className="bg-primary text-primary-foreground rounded-full p-1"
+                          title="AI Transform"
+                        >
+                          <Wand2 className="h-3 w-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="bg-destructive text-destructive-foreground rounded-full p-1"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -472,6 +488,23 @@ const ProductFormDialog = ({
           </div>
         </form>
       </DialogContent>
+
+      {transformingImageIndex !== null && (
+        <ImageTransformDialog
+          open={transformDialogOpen}
+          onOpenChange={(open) => {
+            setTransformDialogOpen(open);
+            if (!open) setTransformingImageIndex(null);
+          }}
+          imageUrl={formData.images[transformingImageIndex]}
+          onTransformed={(newUrl) => {
+            setFormData((prev) => ({
+              ...prev,
+              images: [...prev.images, newUrl],
+            }));
+          }}
+        />
+      )}
     </Dialog>
   );
 };

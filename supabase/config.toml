@@ -1,1 +1,4 @@
 project_id = "mlmsspybcqfdygcmxmjt"
+
+[functions.transform-image]
+verify_jwt = false
