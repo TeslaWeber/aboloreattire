@@ -46,6 +46,7 @@ interface Order {
   total: number;
   notes: string | null;
   created_at: string;
+  receipt_url: string | null;
 }
 
 interface AdminOrdersProps {
