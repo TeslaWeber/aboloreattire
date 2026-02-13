@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Check, CreditCard, Truck, Building2, Copy, ExternalLink, Loader2, MapPin } from "lucide-react";
+import { Check, CreditCard, Truck, Building2, Copy, ExternalLink, Loader2, MapPin, Upload, ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +40,10 @@ const Checkout = () => {
   const [orderReference] = useState(() => `ABL-${Date.now().toString(36).toUpperCase()}`);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const receiptInputRef = useRef<HTMLInputElement>(null);
   const [deliveryData, setDeliveryData] = useState<DeliveryFormData>({
     firstName: "",
     lastName: "",
@@ -116,6 +120,41 @@ const Checkout = () => {
     }
   };
 
+  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "File too large", description: "Receipt image must be under 5MB.", variant: "destructive" });
+        return;
+      }
+      setReceiptFile(file);
+      setReceiptPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeReceipt = () => {
+    setReceiptFile(null);
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    setReceiptPreview(null);
+    if (receiptInputRef.current) receiptInputRef.current.value = "";
+  };
+
+  const uploadReceipt = async (orderId: string): Promise<string | null> => {
+    if (!receiptFile || !user) return null;
+    const ext = receiptFile.name.split(".").pop();
+    const path = `${user.id}/${orderId}.${ext}`;
+    const { error } = await supabase.storage.from("payment-receipts").upload(path, receiptFile);
+    if (error) {
+      console.error("Receipt upload error:", error);
+      return null;
+    }
+    return path;
+  };
+
   const saveOrderToDatabase = async () => {
     if (!user) {
       toast({
@@ -175,6 +214,14 @@ const Checkout = () => {
       if (itemsError) {
         console.error("Order items error:", itemsError);
         throw new Error(itemsError.message);
+      }
+
+      // Upload receipt if bank transfer
+      if (paymentMethod === "bank" && receiptFile) {
+        const receiptPath = await uploadReceipt(order.id);
+        if (receiptPath) {
+          await supabase.from("orders").update({ receipt_url: receiptPath }).eq("id", order.id);
+        }
       }
 
       return true;
@@ -540,17 +587,69 @@ const Checkout = () => {
             </div>
           )}
           <div className="flex flex-col gap-3 mt-6">
-            {/* Payment Confirmation for Bank Transfer on Review Step */}
-            {step === 3 && paymentMethod === "bank" && !paymentConfirmed && (
-              <Button 
-                type="button" 
-                variant="outline"
-                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                onClick={() => setPaymentConfirmed(true)}
-              >
-                <Check className="h-4 w-4 mr-2" />
-                I Have Made Payment
-              </Button>
+            {/* Payment Confirmation + Receipt Upload for Bank Transfer on Review Step */}
+            {step === 3 && paymentMethod === "bank" && (
+              <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                {!paymentConfirmed ? (
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => setPaymentConfirmed(true)}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    I Have Made Payment
+                  </Button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <Check className="h-4 w-4" />
+                      Payment confirmed — now upload your receipt
+                    </div>
+                    
+                    <input 
+                      ref={receiptInputRef}
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleReceiptSelect} 
+                    />
+
+                    {!receiptFile ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full border-dashed border-2 h-24 flex-col gap-2"
+                        onClick={() => receiptInputRef.current?.click()}
+                      >
+                        <Upload className="h-6 w-6 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Click to upload payment receipt</span>
+                      </Button>
+                    ) : (
+                      <div className="relative border border-border rounded-lg overflow-hidden">
+                        <img src={receiptPreview!} alt="Receipt" className="w-full max-h-48 object-contain bg-background" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7"
+                          onClick={removeReceipt}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                        <div className="p-2 bg-muted text-xs text-muted-foreground flex items-center gap-1">
+                          <ImageIcon className="h-3 w-3" />
+                          {receiptFile.name}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!receiptFile && (
+                      <p className="text-xs text-destructive">* You must upload your payment receipt to place your order</p>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
             
             <div className="flex gap-3">
@@ -562,7 +661,7 @@ const Checkout = () => {
               <Button 
                 type="submit" 
                 className="flex-1 luxury-gradient text-primary-foreground font-semibold"
-                disabled={isSubmitting || (step === 3 && paymentMethod === "bank" && !paymentConfirmed)}
+                disabled={isSubmitting || (step === 3 && paymentMethod === "bank" && (!paymentConfirmed || !receiptFile))}
               >
                 {isSubmitting ? (
                   <>
