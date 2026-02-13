@@ -30,6 +30,13 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full">
+      {/* News Flash Ticker */}
+      <div className="bg-primary text-primary-foreground overflow-hidden">
+        <div className="animate-marquee whitespace-nowrap py-1.5 text-xs font-medium">
+          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping and tell others about us.</span>
+          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping and tell others about us.</span>
+        </div>
+      </div>
 
       {/* Main Header */}
       <div className="bg-background/95 backdrop-blur-md border-b border-border">
