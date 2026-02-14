@@ -20,8 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { categories } from "@/data/products";
-import { Upload, X, Image as ImageIcon, Loader2, Wand2 } from "lucide-react";
-import ImageTransformDialog from "./ImageTransformDialog";
+import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 
 interface ProductFormDialogProps {
   open: boolean;
@@ -39,8 +38,6 @@ const ProductFormDialog = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
-  const [transformDialogOpen, setTransformDialogOpen] = useState(false);
-  const [transformingImageIndex, setTransformingImageIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -403,17 +400,6 @@ const ProductFormDialog = ({
                       <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           type="button"
-                          onClick={() => {
-                            setTransformingImageIndex(index);
-                            setTransformDialogOpen(true);
-                          }}
-                          className="bg-primary text-primary-foreground rounded-full p-1"
-                          title="AI Transform"
-                        >
-                          <Wand2 className="h-3 w-3" />
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => removeImage(index)}
                           className="bg-destructive text-destructive-foreground rounded-full p-1"
                         >
@@ -489,22 +475,6 @@ const ProductFormDialog = ({
         </form>
       </DialogContent>
 
-      {transformingImageIndex !== null && (
-        <ImageTransformDialog
-          open={transformDialogOpen}
-          onOpenChange={(open) => {
-            setTransformDialogOpen(open);
-            if (!open) setTransformingImageIndex(null);
-          }}
-          imageUrl={formData.images[transformingImageIndex]}
-          onTransformed={(newUrl) => {
-            setFormData((prev) => ({
-              ...prev,
-              images: [...prev.images, newUrl],
-            }));
-          }}
-        />
-      )}
     </Dialog>
   );
 };
