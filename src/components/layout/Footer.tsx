@@ -74,11 +74,6 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/admin" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                  Admin
-                </Link>
-              </li>
-              <li>
                 <Link to="/auth" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                   Sign In / Sign Up
                 </Link>

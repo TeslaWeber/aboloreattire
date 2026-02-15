@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { Search, User, ShoppingBag, Menu, X, ChevronDown, Smartphone } from "lucide-react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { categories } from "@/data/products";
 import SearchDialog from "@/components/search/SearchDialog";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +23,35 @@ const Header = () => {
   const { totalItems, setIsCartOpen } = useCart();
   const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [hasNotification, setHasNotification] = useState(false);
+
+  // Check for order status changes for red dot notification
+  useEffect(() => {
+    if (!user) return;
+    const checkOrders = async () => {
+      const lastChecked = localStorage.getItem('last-order-check');
+      const { data } = await supabase
+        .from('orders')
+        .select('id, updated_at')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1);
+      if (data && data.length > 0) {
+        if (lastChecked && new Date(data[0].updated_at) > new Date(lastChecked)) {
+          setHasNotification(true);
+        }
+      }
+    };
+    checkOrders();
+    // Listen for realtime changes
+    const channel = supabase
+      .channel('order-updates')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `user_id=eq.${user.id}` }, () => {
+        setHasNotification(true);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -32,9 +62,11 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full">
       {/* News Flash Ticker */}
       <div className="bg-primary text-primary-foreground overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap py-1.5 text-xs font-medium">
-          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping and tell others about us.</span>
-          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping and tell others about us.</span>
+        <div className="animate-marquee whitespace-nowrap py-1.5 text-xs font-medium inline-flex">
+          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
         </div>
       </div>
 
@@ -120,9 +152,13 @@ const Header = () => {
               {user ? (
                 <Link
                   to="/account"
-                  className="p-2 hover:bg-muted rounded-full transition-colors"
+                  className="relative p-2 hover:bg-muted rounded-full transition-colors"
+                  onClick={() => { setHasNotification(false); localStorage.setItem('last-order-check', new Date().toISOString()); }}
                 >
                   <User className="h-5 w-5" />
+                  {hasNotification && (
+                    <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-destructive rounded-full border-2 border-background" />
+                  )}
                 </Link>
               ) : (
                 <DropdownMenu>
@@ -169,23 +205,12 @@ const Header = () => {
             className="lg:hidden bg-card border-b border-border overflow-hidden"
           >
             <nav className="container mx-auto px-4 py-4 space-y-2">
-              {categories.map((category) => (
-                <div key={category.id}>
-                  <Link
-                    to={`/products?category=${category.id}`}
-                    className="block py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {category.name}
-                  </Link>
-                </div>
-              ))}
               <Link
                 to="/products"
                 className="block py-3 text-primary font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                View All Products
+                Shop All Products
               </Link>
               <div className="pt-4 border-t border-border space-y-2">
                 {user ? (
@@ -235,6 +260,27 @@ const Header = () => {
                     </Link>
                   </>
                 )}
+              </div>
+              {/* Get the App */}
+              <div className="pt-4 border-t border-border space-y-2">
+                <a
+                  href="https://median.co/share/yewkqae#apk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Smartphone className="h-5 w-5" />
+                  Get the App (Android)
+                </a>
+                <a
+                  href="#"
+                  className="flex items-center gap-3 py-3 text-muted-foreground font-medium cursor-not-allowed"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  <Smartphone className="h-5 w-5" />
+                  Get the App (iOS) — Coming Soon
+                </a>
               </div>
             </nav>
           </motion.div>
