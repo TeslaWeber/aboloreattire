@@ -403,17 +403,6 @@ const ProductFormDialog = ({
                       <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           type="button"
-                          onClick={() => {
-                            setTransformingImageIndex(index);
-                            setTransformDialogOpen(true);
-                          }}
-                          className="bg-primary text-primary-foreground rounded-full p-1"
-                          title="AI Transform"
-                        >
-                          <Wand2 className="h-3 w-3" />
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => removeImage(index)}
                           className="bg-destructive text-destructive-foreground rounded-full p-1"
                         >

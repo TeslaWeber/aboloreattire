@@ -393,41 +393,6 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Delivery Fee Preview */}
-              {deliveryData.state && (
-                <div className="p-4 bg-muted rounded-lg border border-border">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-primary mt-0.5" />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm mb-1">Delivery Estimate</h4>
-                      <div className="space-y-1 text-sm">
-                        <p className="text-muted-foreground">
-                          <span className="font-medium text-foreground">From:</span> OKI, Ibadan
-                        </p>
-                        <p className="text-muted-foreground">
-                          <span className="font-medium text-foreground">To:</span> {deliveryData.city || "Your city"}, {deliveryData.state}
-                        </p>
-                        {deliveryInfo.zone && (
-                          <>
-                            <p className="text-muted-foreground">
-                              <span className="font-medium text-foreground">Zone:</span> {deliveryInfo.zone.name}
-                            </p>
-                            <p className="text-muted-foreground">
-                              <span className="font-medium text-foreground">Estimated delivery:</span> {deliveryInfo.estimatedDays}
-                            </p>
-                          </>
-                        )}
-                        <p className="font-semibold text-primary pt-1">
-                          Delivery Fee: {delivery === 0 ? "FREE" : formatPrice(delivery)}
-                          {subtotal >= 100000 && delivery === 0 && (
-                            <span className="text-xs text-muted-foreground ml-2">(Orders above ₦100,000)</span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               <div>
                 <Label>Postal Code (Optional)</Label>
@@ -478,9 +443,6 @@ const Checkout = () => {
                   <div className="p-4 bg-muted rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold">Bank Transfer Details</h3>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-                        Ref: {orderReference}
-                      </span>
                     </div>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between items-center">
@@ -504,7 +466,7 @@ const Checkout = () => {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Account Name:</span>
-                        <span className="font-medium text-right">{bankDetails.accountName}</span>
+                        <span className="font-medium text-right text-sm">{bankDetails.accountName}</span>
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t border-border/50">
                         <span className="text-muted-foreground">Amount to Pay:</span>
@@ -514,31 +476,21 @@ const Checkout = () => {
                     
                     <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/10">
                       <p className="text-xs text-muted-foreground">
-                        <strong className="text-foreground">Important:</strong> Use the reference code below as your payment reference/description to help us identify your payment quickly.
+                        <strong className="text-foreground">Important:</strong> Please ensure payment is made to the account above. Your order will be processed once payment is confirmed.
                       </p>
                     </div>
 
-                    {/* Copy Buttons */}
-                    <div className="mt-4 grid grid-cols-2 gap-3">
+                    {/* Copy Button */}
+                    <div className="mt-4">
                       <Button 
                         type="button" 
                         variant="outline" 
                         size="sm"
-                        className="gap-2"
-                        onClick={copyReferenceCode}
-                      >
-                        <Copy className="h-4 w-4" />
-                        Copy Reference
-                      </Button>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm"
-                        className="gap-2"
+                        className="w-full gap-2"
                         onClick={copyAccountNumber}
                       >
                         <Copy className="h-4 w-4" />
-                        Copy Account No.
+                        Copy Account Number
                       </Button>
                     </div>
                   </div>
@@ -603,8 +555,8 @@ const Checkout = () => {
                 ) : (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                      <Check className="h-4 w-4" />
-                      Payment confirmed — now upload your receipt
+                      <Upload className="h-4 w-4" />
+                      Upload your receipt
                     </div>
                     
                     <input 
@@ -684,27 +636,10 @@ const Checkout = () => {
               <span className="text-muted-foreground">Subtotal ({totalItems} items)</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery</span>
-              <div className="text-right">
-                <span>{delivery === 0 ? "Free" : formatPrice(delivery)}</span>
-                {deliveryInfo.zone && delivery > 0 && (
-                  <p className="text-xs text-muted-foreground">{deliveryInfo.estimatedDays}</p>
-                )}
-                {!deliveryData.state && (
-                  <p className="text-xs text-muted-foreground">Select state to calculate</p>
-                )}
-              </div>
-            </div>
-            {subtotal >= 100000 && (
-              <p className="text-xs text-green-600 font-medium">
-                ✓ Free delivery on orders above ₦100,000!
-              </p>
-            )}
           </div>
           <div className="flex justify-between py-4 font-display text-xl font-bold">
             <span>Total</span>
-            <span className="text-primary">{formatPrice(total)}</span>
+            <span className="text-primary">{formatPrice(subtotal)}</span>
           </div>
           
           {/* Delivery origin info */}

@@ -52,9 +52,6 @@ const Index = () => {
             transition={{ duration: 0.8 }}
             className="max-w-2xl"
           >
-            <span className="inline-block px-4 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium mb-4">
-              New Collection 2026
-            </span>
             <h1 className="font-display text-4xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
               Elevate Your <span className="luxury-text-gradient">Style</span>
             </h1>
@@ -181,7 +178,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Truck, title: "Free Delivery", desc: "On orders over ₦100,000" },
+              { icon: Truck, title: "Swift & Safe Delivery", desc: "Your orders, delivered with care" },
               { icon: Shield, title: "Secure Payment", desc: "100% secure checkout" },
               { icon: RefreshCw, title: "Easy Returns", desc: "3-day return policy" },
             ].map((f, i) => (
