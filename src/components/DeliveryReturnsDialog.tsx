@@ -42,9 +42,9 @@ const DeliveryReturnsDialog = ({ open, onOpenChange }: DeliveryReturnsDialogProp
               <h3 className="font-semibold text-lg">Return Policy</h3>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              We offer a 3-day return policy on all goods delivered or collected. 
+              We offer a 2-day return policy on all goods delivered or collected. 
               If you are not completely satisfied with your purchase, you may initiate a return 
-              within three (3) days from the date of delivery or pickup. Please ensure that items 
+              within two (2) days from the date of delivery or pickup. Please ensure that items 
               are returned in their original condition with all tags attached. For assistance with 
               returns, kindly contact our customer service team.
             </p>

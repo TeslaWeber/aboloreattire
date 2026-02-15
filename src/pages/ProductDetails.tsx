@@ -136,8 +136,8 @@ const ProductDetails = () => {
             </div>
 
             <div className="space-y-3 pt-6 border-t border-border">
-              <div className="flex items-center gap-3 text-sm"><Truck className="h-5 w-5 text-primary" /><span>Free delivery on orders over ₦100,000</span></div>
-              <div className="flex items-center gap-3 text-sm"><Shield className="h-5 w-5 text-primary" /><span>3-day return policy</span></div>
+              <div className="flex items-center gap-3 text-sm"><Truck className="h-5 w-5 text-primary" /><span>Swift & Safe Delivery</span></div>
+              <div className="flex items-center gap-3 text-sm"><Shield className="h-5 w-5 text-primary" /><span>2-day return policy</span></div>
             </div>
           </div>
         </div>
