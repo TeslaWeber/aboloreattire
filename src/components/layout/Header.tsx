@@ -1,31 +1,33 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ShoppingBag, Menu, X, ChevronDown, Smartphone } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, Smartphone } from "lucide-react";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { categories } from "@/data/products";
 import SearchDialog from "@/components/search/SearchDialog";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const { totalItems, setIsCartOpen } = useCart();
   const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [hasNotification, setHasNotification] = useState(false);
+  const [hasAdminNotification, setHasAdminNotification] = useState(false);
 
-  // Check for order status changes for red dot notification
+  // User order notification
   useEffect(() => {
     if (!user) return;
     const checkOrders = async () => {
@@ -43,7 +45,6 @@ const Header = () => {
       }
     };
     checkOrders();
-    // Listen for realtime changes
     const channel = supabase
       .channel('order-updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `user_id=eq.${user.id}` }, () => {
@@ -52,6 +53,32 @@ const Header = () => {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [user]);
+
+  // Admin new order notification
+  useEffect(() => {
+    if (!isAdmin) return;
+    const lastAdminCheck = localStorage.getItem('admin-last-order-check');
+    const checkNewOrders = async () => {
+      const { data } = await supabase
+        .from('orders')
+        .select('id, created_at')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (data && data.length > 0 && lastAdminCheck) {
+        if (new Date(data[0].created_at) > new Date(lastAdminCheck)) {
+          setHasAdminNotification(true);
+        }
+      }
+    };
+    checkNewOrders();
+    const channel = supabase
+      .channel('admin-new-orders')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => {
+        setHasAdminNotification(true);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [isAdmin]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -76,10 +103,13 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2 hover:bg-muted rounded-md transition-colors"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden relative p-2 hover:bg-muted rounded-md transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Menu className="h-6 w-6" />
+              {(hasAdminNotification && isAdmin) && (
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-destructive rounded-full border-2 border-background" />
+              )}
             </button>
 
             {/* Logo */}
@@ -89,66 +119,27 @@ const Header = () => {
               </h1>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - minimal */}
             <nav className="hidden lg:flex items-center space-x-8">
-              {categories.slice(0, 5).map((category) => (
-                <div
-                  key={category.id}
-                  className="relative group"
-                  onMouseEnter={() => setActiveCategory(category.id)}
-                  onMouseLeave={() => setActiveCategory(null)}
-                >
-                  <Link
-                    to={`/products?category=${category.id}`}
-                    className="flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors py-6"
-                  >
-                    {category.name.split("'")[0]}
-                    <ChevronDown className="h-4 w-4" />
-                  </Link>
-
-                  {/* Dropdown */}
-                  <AnimatePresence>
-                    {activeCategory === category.id && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 bg-card border border-border rounded-lg shadow-lg p-4 min-w-[200px]"
-                      >
-                        {category.subcategories.map((sub) => (
-                          <Link
-                            key={sub}
-                            to={`/products?category=${category.id}&subcategory=${sub}`}
-                            className="block px-4 py-2 text-sm text-foreground/80 hover:text-primary hover:bg-muted rounded-md transition-colors"
-                          >
-                            {sub}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-              <Link
-                to="/products"
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-              >
+              <Link to="/products" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
                 All Products
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="relative text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
+                  Admin Dashboard
+                  {hasAdminNotification && (
+                    <span className="absolute -top-1 -right-3 h-2.5 w-2.5 bg-destructive rounded-full" />
+                  )}
+                </Link>
+              )}
             </nav>
 
             {/* Actions */}
             <div className="flex items-center gap-2 lg:gap-4">
-              {/* Search */}
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 hover:bg-muted rounded-full transition-colors"
-              >
+              <button onClick={() => setIsSearchOpen(true)} className="p-2 hover:bg-muted rounded-full transition-colors">
                 <Search className="h-5 w-5" />
               </button>
 
-              {/* Account Icon - Direct link when logged in, dropdown when not */}
               {user ? (
                 <Link
                   to="/account"
@@ -168,21 +159,13 @@ const Header = () => {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth?mode=signin">Sign In</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth?mode=signup">Create Account</Link>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/auth?mode=signin">Sign In</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/auth?mode=signup">Create Account</Link></DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
 
-              {/* Cart */}
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="relative p-2 hover:bg-muted rounded-full transition-colors"
-              >
+              <button onClick={() => setIsCartOpen(true)} className="relative p-2 hover:bg-muted rounded-full transition-colors">
                 <ShoppingBag className="h-5 w-5" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -195,97 +178,80 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-card border-b border-border overflow-hidden"
-          >
-            <nav className="container mx-auto px-4 py-4 space-y-2">
-              <Link
-                to="/products"
-                className="block py-3 text-primary font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Shop All Products
-              </Link>
-              <div className="pt-4 border-t border-border space-y-2">
-                {user ? (
-                  <>
-                    <p className="text-xs text-muted-foreground py-2">{user.email}</p>
-                    <Link
-                      to="/account"
-                      className="block py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      My Account
-                    </Link>
-                    {isAdmin && (
-                      <Link
-                        to="/admin"
-                        className="block py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Admin Dashboard
-                      </Link>
-                    )}
-                    <button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block py-3 text-foreground/80 hover:text-primary transition-colors font-medium w-full text-left"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/auth?mode=signin"
-                      className="block py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      to="/auth?mode=signup"
-                      className="block py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Create Account
-                    </Link>
-                  </>
-                )}
-              </div>
-              {/* Get the App */}
-              <div className="pt-4 border-t border-border space-y-2">
-                <a
-                  href="https://median.co/share/yewkqae#apk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 py-3 text-foreground/80 hover:text-primary transition-colors font-medium"
+      {/* Mobile Side Menu (Sheet) */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetContent side="left" className="w-72 p-0">
+          <SheetHeader className="p-6 border-b border-border">
+            <SheetTitle className="font-display text-lg luxury-text-gradient text-left">ABOLORE COUTURE</SheetTitle>
+          </SheetHeader>
+          <nav className="p-4 space-y-1">
+            {user ? (
+              <>
+                <Link
+                  to="/account"
+                  className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <Smartphone className="h-5 w-5" />
-                  Get the App (Android)
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center gap-3 py-3 text-muted-foreground font-medium cursor-not-allowed"
-                  onClick={(e) => e.preventDefault()}
+                  My Account
+                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="relative block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setHasAdminNotification(false);
+                      localStorage.setItem('admin-last-order-check', new Date().toISOString());
+                    }}
+                  >
+                    Admin Dashboard
+                    {hasAdminNotification && (
+                      <span className="absolute top-3 right-3 h-2.5 w-2.5 bg-destructive rounded-full" />
+                    )}
+                  </Link>
+                )}
+                <button
+                  onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }}
+                  className="block w-full text-left py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
                 >
-                  <Smartphone className="h-5 w-5" />
-                  Get the App (iOS) — Coming Soon
-                </a>
-              </div>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth?mode=signin" className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                  Sign In
+                </Link>
+                <Link to="/auth?mode=signup" className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                  Create Account
+                </Link>
+              </>
+            )}
+
+            {/* Get the App */}
+            <div className="pt-4 mt-4 border-t border-border space-y-1">
+              <a
+                href="https://median.co/share/yewkqae#apk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 py-3 px-3 text-primary font-medium hover:bg-muted rounded-lg transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Smartphone className="h-5 w-5" />
+                Get the App (Android)
+              </a>
+              <a
+                href="#"
+                className="flex items-center gap-3 py-3 px-3 text-primary/50 font-medium cursor-not-allowed"
+                onClick={(e) => e.preventDefault()}
+              >
+                <Smartphone className="h-5 w-5" />
+                Get the App (iOS) — Coming Soon
+              </a>
+            </div>
+          </nav>
+        </SheetContent>
+      </Sheet>
 
       {/* Search Dialog */}
       <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
