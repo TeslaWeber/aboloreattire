@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ShoppingBag, Menu, Smartphone } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, Smartphone, Truck, Shield, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -227,6 +227,22 @@ const Header = () => {
                 </Link>
               </>
             )}
+
+            {/* Features */}
+            <div className="pt-4 mt-4 border-t border-border space-y-1">
+              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
+                <Truck className="h-5 w-5 text-primary" />
+                Swift & Safe Delivery
+              </div>
+              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
+                <Shield className="h-5 w-5 text-primary" />
+                Secure Payment
+              </div>
+              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
+                <RefreshCw className="h-5 w-5 text-primary" />
+                Easy Returns
+              </div>
+            </div>
 
             {/* Get the App */}
             <div className="pt-4 mt-4 border-t border-border space-y-1">

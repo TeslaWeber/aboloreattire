@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DeliveryReturnsDialog from "@/components/DeliveryReturnsDialog";
 import { useAuth } from "@/context/AuthContext";
@@ -64,23 +64,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Accounts */}
-          <div>
-            <h5 className="font-semibold text-foreground mb-4">Accounts</h5>
-            <ul className="space-y-3">
-              <li>
-                <Link to="/account" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                  My Account
-                </Link>
-              </li>
-              <li>
-                <Link to="/auth" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                  Sign In / Sign Up
-                </Link>
-              </li>
-            </ul>
-          </div>
-
           {/* Customer Service */}
           <div>
             <h5 className="font-semibold text-foreground mb-4">Customer Service</h5>
@@ -133,9 +116,17 @@ const Footer = () => {
       <div className="border-t border-border">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-muted-foreground text-sm">
-              © 2026 ABOLORE COUTURE. All rights reserved.
-            </p>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <a
+                href="https://wa.me/2348064051248"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-success hover:text-success/80 transition-colors"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </a>
+              <p>© 2026 — Developed by TeslaWeber Incorporations</p>
+            </div>
             <div className="flex gap-6">
               <Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                 Privacy Policy

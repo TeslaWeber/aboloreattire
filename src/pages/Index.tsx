@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Truck, Shield, RefreshCw, User } from "lucide-react";
+import { ArrowRight, Star, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categories, formatPrice } from "@/data/products";
 import { useFeaturedProducts } from "@/hooks/useProducts";
@@ -173,28 +173,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-card border-y border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: Truck, title: "Swift & Safe Delivery", desc: "Your orders, delivered with care" },
-              { icon: Shield, title: "Secure Payment", desc: "100% secure checkout" },
-              { icon: RefreshCw, title: "Easy Returns", desc: "3-day return policy" },
-            ].map((f, i) => (
-              <div key={i} className="flex items-center gap-4 justify-center">
-                <div className="shrink-0 p-3 bg-primary/10 rounded-full">
-                  <f.icon className="h-6 w-6 text-primary" />
-                </div>
-                <div className="text-left">
-                  <h4 className="font-semibold">{f.title}</h4>
-                  <p className="text-sm text-muted-foreground">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
