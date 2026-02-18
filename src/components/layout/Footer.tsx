@@ -115,8 +115,17 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="border-t border-border">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex gap-6">
+              <Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                Terms of Service
+              </Link>
+            </div>
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <p>© 2026 — Developed by TeslaWeber Incorporations</p>
               <a
                 href="https://wa.me/2348064051248"
                 target="_blank"
@@ -125,15 +134,6 @@ const Footer = () => {
               >
                 <MessageCircle className="h-5 w-5" />
               </a>
-              <p>© 2026 — Developed by TeslaWeber Incorporations</p>
-            </div>
-            <div className="flex gap-6">
-              <Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                Terms of Service
-              </Link>
             </div>
           </div>
         </div>
