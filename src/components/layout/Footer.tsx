@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DeliveryReturnsDialog from "@/components/DeliveryReturnsDialog";
 import { useAuth } from "@/context/AuthContext";
@@ -58,8 +58,10 @@ const Footer = () => {
               >
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
+              <a href="https://vm.tiktok.com/ZS9eer3pedtaf-mXpAe/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.52a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.73a8.19 8.19 0 004.76 1.52v-3.4a4.85 4.85 0 01-1-.16z"/>
+                </svg>
               </a>
             </div>
           </div>
@@ -125,7 +127,7 @@ const Footer = () => {
               </Link>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
-              <p>© 2026 — Developed by TeslaWeber Incorporations</p>
+              <p>Developed by TeslaWeber Incorporations</p>
               <a
                 href="https://wa.me/2348064051248"
                 target="_blank"

@@ -69,56 +69,31 @@ const DashboardStats = ({
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Pending Orders */}
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="h-5 w-5 text-yellow-500" />
-            <h3 className="font-display text-lg font-semibold">Pending Orders</h3>
-            <span className="ml-auto text-sm text-muted-foreground">{pendingOrders} pending</span>
-          </div>
-          {recentOrders.filter(o => o.status === "pending").length === 0 ? (
-            <p className="text-muted-foreground text-sm py-4">No pending orders</p>
-          ) : (
-            <div className="space-y-3">
-              {recentOrders
-                .filter(o => o.status === "pending")
-                .slice(0, 5)
-                .map((order) => (
-                  <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                    <div>
-                      <p className="text-sm font-medium">{order.customer_name}</p>
-                      <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <p className="text-sm font-bold text-primary">{formatPrice(order.total)}</p>
-                  </div>
-                ))}
-            </div>
-          )}
+      {/* Pending Orders */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Clock className="h-5 w-5 text-yellow-500" />
+          <h3 className="font-display text-lg font-semibold">Pending Orders</h3>
+          <span className="ml-auto text-sm text-muted-foreground">{pendingOrders} pending</span>
         </div>
-
-        {/* Recent Orders */}
-        <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-5 w-5 text-green-500" />
-            <h3 className="font-display text-lg font-semibold">Recent Orders</h3>
-          </div>
-          {recentOrders.length === 0 ? (
-            <p className="text-muted-foreground text-sm py-4">No orders yet</p>
-          ) : (
-            <div className="space-y-3">
-              {recentOrders.slice(0, 5).map((order) => (
+        {recentOrders.filter(o => o.status === "pending").length === 0 ? (
+          <p className="text-muted-foreground text-sm py-4">No pending orders</p>
+        ) : (
+          <div className="space-y-3">
+            {recentOrders
+              .filter(o => o.status === "pending")
+              .slice(0, 5)
+              .map((order) => (
                 <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div>
                     <p className="text-sm font-medium">{order.customer_name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{order.status}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
                   </div>
                   <p className="text-sm font-bold text-primary">{formatPrice(order.total)}</p>
                 </div>
               ))}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
