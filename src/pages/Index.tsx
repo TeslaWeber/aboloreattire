@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, User } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categories, formatPrice } from "@/data/products";
 import { useFeaturedProducts } from "@/hooks/useProducts";
@@ -11,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const Index = () => {
   const { products: featuredProducts, loading } = useFeaturedProducts();
   const { user } = useAuth();
+  const [visibleCount, setVisibleCount] = useState(10);
   
   // Get user's name from metadata or email
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Valued Customer';
@@ -27,14 +29,9 @@ const Index = () => {
               transition={{ duration: 0.4 }}
               className="flex items-center justify-between"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/20 rounded-full">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Welcome back,</p>
-                  <p className="font-display font-semibold text-foreground">{userName}</p>
-                </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Welcome back,</p>
+                <p className="font-display text-sm font-medium text-foreground">{userName}</p>
               </div>
             </motion.div>
           </div>
@@ -101,14 +98,9 @@ const Index = () => {
       {/* Featured Products */}
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="font-display text-3xl lg:text-4xl font-bold">
-              Featured <span className="luxury-text-gradient">Products</span>
-            </h2>
-            <Link to="/products" className="text-primary hover:underline flex items-center gap-1 whitespace-nowrap">
-              View All <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+          <h2 className="font-display text-2xl lg:text-3xl font-bold mb-12">
+            Featured <span className="luxury-text-gradient">Products</span>
+          </h2>
           
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -129,7 +121,7 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-              {featuredProducts.slice(0, 8).map((product, i) => (
+              {featuredProducts.slice(0, visibleCount).map((product, i) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -168,6 +160,18 @@ const Index = () => {
                   </Link>
                 </motion.div>
               ))}
+            </div>
+          )}
+          {!loading && featuredProducts.length > visibleCount && (
+            <div className="flex justify-center mt-10">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setVisibleCount((prev) => prev + 10)}
+                className="font-semibold"
+              >
+                Load More
+              </Button>
             </div>
           )}
         </div>
