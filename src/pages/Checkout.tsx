@@ -299,14 +299,14 @@ const Checkout = () => {
       <h1 className="font-display text-3xl font-bold mb-8">Checkout</h1>
 
       {/* Steps */}
-      <div className="flex items-center justify-center mb-8 gap-4">
+      <div className="flex items-center justify-center mb-8 gap-1 sm:gap-3 w-full overflow-hidden px-2">
         {[{ n: 1, label: "Delivery" }, { n: 2, label: "Payment" }, { n: 3, label: "Review" }].map((s, i) => (
-          <div key={s.n} className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step >= s.n ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-              {step > s.n ? <Check className="h-4 w-4" /> : s.n}
+          <div key={s.n} className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${step >= s.n ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+              {step > s.n ? <Check className="h-3.5 w-3.5" /> : s.n}
             </div>
-            <span className={step >= s.n ? "text-foreground" : "text-muted-foreground"}>{s.label}</span>
-            {i < 2 && <div className={`w-12 h-0.5 ${step > s.n ? "bg-primary" : "bg-muted"}`} />}
+            <span className={`text-xs sm:text-sm ${step >= s.n ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
+            {i < 2 && <div className={`w-6 sm:w-12 h-0.5 ${step > s.n ? "bg-primary" : "bg-muted"}`} />}
           </div>
         ))}
       </div>
