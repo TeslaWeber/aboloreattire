@@ -20,7 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { categories } from "@/data/products";
-import { Upload, X, Image as ImageIcon, Loader2, User } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Loader2, Wand2 } from "lucide-react";
 import MannequinPreviewDialog from "./MannequinPreviewDialog";
 
 interface ProductFormDialogProps {
@@ -277,9 +277,9 @@ const ProductFormDialog = ({
                             setMannequinDialogOpen(true);
                           }}
                           className="bg-primary text-primary-foreground rounded-full p-1"
-                          title="Mannequin Preview"
+                          title="AI Transform"
                         >
-                          <User className="h-3 w-3" />
+                          <Wand2 className="h-3 w-3" />
                         </button>
                         <button type="button" onClick={() => removeImage(index)} className="bg-destructive text-destructive-foreground rounded-full p-1">
                           <X className="h-3 w-3" />
