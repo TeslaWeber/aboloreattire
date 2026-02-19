@@ -44,7 +44,15 @@ serve(async (req) => {
       throw new Error(`Failed to fetch source image: ${imageResponse.status}`);
     }
     const imageBuffer = await imageResponse.arrayBuffer();
-    const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+    const bytes = new Uint8Array(imageBuffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      const chunk = bytes.subarray(i, Math.min(i + 8192, bytes.length));
+      for (let j = 0; j < chunk.length; j++) {
+        binary += String.fromCharCode(chunk[j]);
+      }
+    }
+    const imageBase64 = btoa(binary);
     const contentType = imageResponse.headers.get("content-type") || "image/jpeg";
 
     // Call Gemini API directly
