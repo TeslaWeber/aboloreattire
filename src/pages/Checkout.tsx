@@ -37,6 +37,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "bank">("card");
+  const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [orderReference] = useState(() => `ABL-${Date.now().toString(36).toUpperCase()}`);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
@@ -155,7 +156,7 @@ const Checkout = () => {
     return path;
   };
 
-  const saveOrderToDatabase = async () => {
+  const saveOrderToDatabase = async (): Promise<string | false> => {
     if (!user) {
       toast({
         title: "Please sign in",
@@ -169,7 +170,6 @@ const Checkout = () => {
     setIsSubmitting(true);
 
     try {
-      // Create the order
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
@@ -180,7 +180,7 @@ const Checkout = () => {
           delivery_address: deliveryData.address,
           delivery_city: deliveryData.city,
           delivery_state: deliveryData.state,
-          payment_method: paymentMethod === "card" ? "Credit/Debit Card" : "Bank Transfer",
+          payment_method: paymentMethod === "card" ? "Paystack" : "Bank Transfer",
           subtotal: subtotal,
           delivery_fee: delivery,
           total: total,
@@ -195,7 +195,6 @@ const Checkout = () => {
         throw new Error(orderError.message);
       }
 
-      // Create order items
       const orderItems = items.map(item => ({
         order_id: order.id,
         product_id: item.product.id,
@@ -224,7 +223,7 @@ const Checkout = () => {
         }
       }
 
-      return true;
+      return order.id;
     } catch (error) {
       console.error("Error saving order:", error);
       toast({
@@ -238,10 +237,39 @@ const Checkout = () => {
     }
   };
 
+  const initializePaystackPayment = async (orderId: string) => {
+    setIsInitializingPayment(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("initialize-payment", {
+        body: {
+          email: deliveryData.email,
+          amount: total,
+          orderId,
+          callbackUrl: `${window.location.origin}/payment-success`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        throw new Error("No payment URL received");
+      }
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      toast({
+        title: "Payment Error",
+        description: "Failed to initialize payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInitializingPayment(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate state selection on step 1
     if (step === 1 && !deliveryData.state) {
       toast({
         title: "State Required",
@@ -251,16 +279,21 @@ const Checkout = () => {
       return;
     }
     
-    
     if (step < 3) { 
       setStep(step + 1); 
       return; 
     }
 
     // Final step - place the order
-    const success = await saveOrderToDatabase();
+    const orderId = await saveOrderToDatabase();
     
-    if (success) {
+    if (!orderId) return;
+
+    if (paymentMethod === "card") {
+      // Redirect to Paystack
+      await initializePaystackPayment(orderId);
+    } else {
+      // Bank transfer - order already saved
       toast({ 
         title: "Order Placed!", 
         description: "Thank you for your order. Please allow some time for your payment to be verified and processed." 
@@ -428,13 +461,14 @@ const Checkout = () => {
               </RadioGroup>
 
               {paymentMethod === "card" && (
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div><Label>Card Number</Label><Input placeholder="1234 5678 9012 3456" required /></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div><Label>Expiry Date</Label><Input placeholder="MM/YY" required /></div>
-                    <div><Label>CVV</Label><Input placeholder="123" required /></div>
+                <div className="p-4 bg-muted rounded-lg space-y-2 mt-4 border-t border-border">
+                  <div className="flex items-center gap-2 text-primary">
+                    <CreditCard className="h-5 w-5" />
+                    <span className="font-semibold">Pay with Paystack</span>
                   </div>
-                  <div><Label>Name on Card</Label><Input required /></div>
+                  <p className="text-sm text-muted-foreground">
+                    You'll be redirected to Paystack's secure payment page to complete your payment with card, bank transfer, or USSD.
+                  </p>
                 </div>
               )}
 
@@ -613,15 +647,15 @@ const Checkout = () => {
               <Button 
                 type="submit" 
                 className="flex-1 luxury-gradient text-primary-foreground font-semibold"
-                disabled={isSubmitting || (step === 3 && paymentMethod === "bank" && (!paymentConfirmed || !receiptFile))}
+                disabled={isSubmitting || isInitializingPayment || (step === 3 && paymentMethod === "bank" && (!paymentConfirmed || !receiptFile))}
               >
-                {isSubmitting ? (
+                {isSubmitting || isInitializingPayment ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Processing...
+                    {isInitializingPayment ? "Redirecting to Paystack..." : "Processing..."}
                   </>
                 ) : (
-                  step === 3 ? "Place Order" : "Continue"
+                  step === 3 ? (paymentMethod === "card" ? "Pay Now" : "Place Order") : "Continue"
                 )}
               </Button>
             </div>
