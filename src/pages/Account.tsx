@@ -11,12 +11,15 @@ import {
   User,
   ShoppingBag,
   AlertCircle,
+  Fingerprint,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/data/products";
 
@@ -63,12 +66,36 @@ interface OrderItem {
 }
 
 const Account = () => {
-  const { user, loading } = useAuth();
+  const { user, session, loading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { isSupported: biometricSupported, isRegistering, register } = useBiometricAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderItems, setOrderItems] = useState<Record<string, OrderItem[]>>({});
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [hasBiometric, setHasBiometric] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("webauthn_credentials")
+        .select("id")
+        .eq("user_id", user.id)
+        .then(({ data }) => setHasBiometric((data?.length || 0) > 0));
+    }
+  }, [user]);
+
+  const handleRegisterBiometric = async () => {
+    if (!session?.access_token) return;
+    const { success, error } = await register(session.access_token);
+    if (success) {
+      setHasBiometric(true);
+      toast({ title: "Biometric registered!", description: "You can now sign in with fingerprint or Face ID." });
+    } else {
+      toast({ title: "Registration failed", description: error, variant: "destructive" });
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -464,6 +491,33 @@ const Account = () => {
                     </label>
                     <p className="mt-1">{orders.length}</p>
                   </div>
+
+                  {/* Biometric Registration */}
+                  {biometricSupported && (
+                    <div className="pt-4 border-t border-border">
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Biometric Sign-In
+                      </label>
+                      <p className="text-xs text-muted-foreground mt-1 mb-3">
+                        {hasBiometric
+                          ? "Fingerprint or Face ID is set up for this account."
+                          : "Set up fingerprint or Face ID for faster sign-in."}
+                      </p>
+                      <Button
+                        variant={hasBiometric ? "outline" : "default"}
+                        onClick={handleRegisterBiometric}
+                        disabled={isRegistering}
+                        className="flex items-center gap-2"
+                      >
+                        <Fingerprint className="h-4 w-4" />
+                        {isRegistering
+                          ? "Setting up..."
+                          : hasBiometric
+                          ? "Add Another Device"
+                          : "Set Up Biometric Sign-In"}
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

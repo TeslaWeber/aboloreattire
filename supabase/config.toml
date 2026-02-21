@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.paystack-webhook]
 verify_jwt = false
+
+[functions.webauthn-register]
+verify_jwt = false
+
+[functions.webauthn-authenticate]
+verify_jwt = false
