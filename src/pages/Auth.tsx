@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Fingerprint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { z } from "zod";
-
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -42,6 +42,21 @@ const Auth = () => {
   const { user, signIn, signUp, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isSupported: biometricSupported, isAuthenticating, authenticate } = useBiometricAuth();
+
+  const handleBiometricSignIn = async () => {
+    if (!formData.email) {
+      setErrors({ email: "Please enter your email first" });
+      return;
+    }
+    const { success, error } = await authenticate(formData.email);
+    if (success) {
+      toast({ title: "Welcome back!", description: "Signed in with biometrics." });
+      navigate(isAdminRoute ? "/admin" : "/");
+    } else {
+      toast({ title: "Biometric sign-in failed", description: error, variant: "destructive" });
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -287,6 +302,19 @@ const Auth = () => {
             >
               {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
             </Button>
+
+            {biometricSupported && !isSignUp && (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isAuthenticating}
+                onClick={handleBiometricSignIn}
+                className="w-full flex items-center gap-2"
+              >
+                <Fingerprint className="h-5 w-5" />
+                {isAuthenticating ? "Verifying..." : "Sign in with Fingerprint / Face ID"}
+              </Button>
+            )}
           </form>
 
           {!isAdminRoute && (
