@@ -25,7 +25,7 @@ interface Order {
   total: number;
   notes: string | null;
   created_at: string;
-  receipt_url: string | null;
+  
 }
 
 interface OrderItem {
@@ -51,14 +51,9 @@ const OrderDetailsDialog = ({
 }: OrderDetailsDialogProps) => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
-
   useEffect(() => {
     if (open && order) {
       fetchOrderItems();
-      fetchReceiptUrl();
-    } else {
-      setReceiptUrl(null);
     }
   }, [open, order]);
 
@@ -73,13 +68,6 @@ const OrderDetailsDialog = ({
     setLoading(false);
   };
 
-  const fetchReceiptUrl = async () => {
-    if (!order?.receipt_url) { setReceiptUrl(null); return; }
-    const { data, error } = await supabase.storage
-      .from("payment-receipts")
-      .createSignedUrl(order.receipt_url, 3600);
-    if (!error && data) setReceiptUrl(data.signedUrl);
-  };
 
   if (!order) return null;
 
@@ -198,21 +186,6 @@ const OrderDetailsDialog = ({
             </div>
           </div>
 
-          {/* Payment Receipt */}
-          {order.receipt_url && receiptUrl && (
-            <div>
-              <h3 className="font-semibold mb-2">Payment Receipt</h3>
-              <div className="bg-muted/50 rounded-lg p-4">
-                <img
-                  src={receiptUrl}
-                  alt="Payment receipt"
-                  className="w-full max-h-64 object-contain rounded border border-border cursor-pointer"
-                  onClick={() => window.open(receiptUrl, "_blank")}
-                />
-                <p className="text-xs text-muted-foreground mt-2 text-center">Click to view full size</p>
-              </div>
-            </div>
-          )}
 
           {order.notes && (
             <div>
