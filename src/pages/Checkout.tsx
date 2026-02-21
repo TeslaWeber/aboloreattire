@@ -1,10 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Check, CreditCard, Truck, Building2, Copy, ExternalLink, Loader2, MapPin, Upload, ImageIcon, X } from "lucide-react";
+import { Check, CreditCard, Truck, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -36,15 +35,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "bank">("card");
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
-  const [orderReference] = useState(() => `ABL-${Date.now().toString(36).toUpperCase()}`);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
-  const [receiptFile, setReceiptFile] = useState<File | null>(null);
-  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
-  const [uploadingReceipt, setUploadingReceipt] = useState(false);
-  const receiptInputRef = useRef<HTMLInputElement>(null);
   const [deliveryData, setDeliveryData] = useState<DeliveryFormData>({
     firstName: "",
     lastName: "",
@@ -56,14 +48,12 @@ const Checkout = () => {
     postalCode: "",
   });
   
-  // Calculate delivery fee based on selected state and city
   const [deliveryInfo, setDeliveryInfo] = useState<{
     fee: number;
     zone: DeliveryZone | null;
     estimatedDays: string;
   }>({ fee: 0, zone: null, estimatedDays: "" });
 
-  // Update delivery fee whenever state or city changes
   useEffect(() => {
     if (deliveryData.state) {
       const info = calculateDeliveryFee(
@@ -79,81 +69,8 @@ const Checkout = () => {
   const delivery = deliveryInfo.fee;
   const total = subtotal + delivery;
 
-  const bankDetails = {
-    bankName: "OPAY",
-    accountNumber: "8022050740",
-    accountName: "SULIYAT TITILOPE ABDULLAHI",
-  };
-
   const handleInputChange = (field: keyof DeliveryFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setDeliveryData(prev => ({ ...prev, [field]: e.target.value }));
-  };
-
-  const copyAccountNumber = async () => {
-    try {
-      await navigator.clipboard.writeText(bankDetails.accountNumber);
-      toast({
-        title: "Account Number Copied",
-        description: "Account number copied to clipboard.",
-      });
-    } catch {
-      toast({
-        title: "Copy Failed",
-        description: "Please copy manually: " + bankDetails.accountNumber,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const copyReferenceCode = async () => {
-    try {
-      await navigator.clipboard.writeText(orderReference);
-      toast({
-        title: "Reference Code Copied",
-        description: "Reference code copied to clipboard.",
-      });
-    } catch {
-      toast({
-        title: "Copy Failed",
-        description: "Please copy manually: " + orderReference,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast({ title: "File too large", description: "Receipt image must be under 5MB.", variant: "destructive" });
-        return;
-      }
-      setReceiptFile(file);
-      setReceiptPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const removeReceipt = () => {
-    setReceiptFile(null);
-    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
-    setReceiptPreview(null);
-    if (receiptInputRef.current) receiptInputRef.current.value = "";
-  };
-
-  const uploadReceipt = async (orderId: string): Promise<string | null> => {
-    if (!receiptFile || !user) return null;
-    const ext = receiptFile.name.split(".").pop();
-    const path = `${user.id}/${orderId}.${ext}`;
-    const { error } = await supabase.storage.from("payment-receipts").upload(path, receiptFile);
-    if (error) {
-      console.error("Receipt upload error:", error);
-      return null;
-    }
-    return path;
   };
 
   const saveOrderToDatabase = async (): Promise<string | false> => {
@@ -180,11 +97,10 @@ const Checkout = () => {
           delivery_address: deliveryData.address,
           delivery_city: deliveryData.city,
           delivery_state: deliveryData.state,
-          payment_method: paymentMethod === "card" ? "Paystack" : "Bank Transfer",
+          payment_method: "Paystack",
           subtotal: subtotal,
           delivery_fee: delivery,
           total: total,
-          notes: `Order Reference: ${orderReference}`,
           status: "pending",
         })
         .select()
@@ -213,14 +129,6 @@ const Checkout = () => {
       if (itemsError) {
         console.error("Order items error:", itemsError);
         throw new Error(itemsError.message);
-      }
-
-      // Upload receipt if bank transfer
-      if (paymentMethod === "bank" && receiptFile) {
-        const receiptPath = await uploadReceipt(order.id);
-        if (receiptPath) {
-          await supabase.from("orders").update({ receipt_url: receiptPath }).eq("id", order.id);
-        }
       }
 
       return order.id;
@@ -279,31 +187,17 @@ const Checkout = () => {
       return;
     }
     
-    if (step < 3) { 
+    if (step < 2) { 
       setStep(step + 1); 
       return; 
     }
 
-    // Final step - place the order
+    // Final step - place the order and redirect to Paystack
     const orderId = await saveOrderToDatabase();
-    
     if (!orderId) return;
-
-    if (paymentMethod === "card") {
-      // Redirect to Paystack
-      await initializePaystackPayment(orderId);
-    } else {
-      // Bank transfer - order already saved
-      toast({ 
-        title: "Order Placed!", 
-        description: "Thank you for your order. Please allow some time for your payment to be verified and processed." 
-      });
-      clearCart();
-      navigate("/");
-    }
+    await initializePaystackPayment(orderId);
   };
 
-  // Redirect to auth if not logged in
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
@@ -333,13 +227,13 @@ const Checkout = () => {
 
       {/* Steps */}
       <div className="flex items-center justify-center mb-8 gap-1 sm:gap-3 w-full overflow-hidden px-2">
-        {[{ n: 1, label: "Delivery" }, { n: 2, label: "Payment" }, { n: 3, label: "Review" }].map((s, i) => (
+        {[{ n: 1, label: "Delivery" }, { n: 2, label: "Review & Pay" }].map((s, i) => (
           <div key={s.n} className="flex items-center gap-1 sm:gap-2 shrink-0">
             <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${step >= s.n ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
               {step > s.n ? <Check className="h-3.5 w-3.5" /> : s.n}
             </div>
             <span className={`text-xs sm:text-sm ${step >= s.n ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
-            {i < 2 && <div className={`w-6 sm:w-12 h-0.5 ${step > s.n ? "bg-primary" : "bg-muted"}`} />}
+            {i < 1 && <div className={`w-6 sm:w-12 h-0.5 ${step > s.n ? "bg-primary" : "bg-muted"}`} />}
           </div>
         ))}
       </div>
@@ -354,48 +248,25 @@ const Checkout = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label>First Name</Label>
-                  <Input 
-                    required 
-                    value={deliveryData.firstName}
-                    onChange={handleInputChange("firstName")}
-                  />
+                  <Input required value={deliveryData.firstName} onChange={handleInputChange("firstName")} />
                 </div>
                 <div>
                   <Label>Last Name</Label>
-                  <Input 
-                    required 
-                    value={deliveryData.lastName}
-                    onChange={handleInputChange("lastName")}
-                  />
+                  <Input required value={deliveryData.lastName} onChange={handleInputChange("lastName")} />
                 </div>
               </div>
               <div>
                 <Label>Email</Label>
-                <Input 
-                  type="email" 
-                  required 
-                  value={deliveryData.email}
-                  onChange={handleInputChange("email")}
-                />
+                <Input type="email" required value={deliveryData.email} onChange={handleInputChange("email")} />
               </div>
               <div>
                 <Label>Phone</Label>
-                <Input 
-                  type="tel" 
-                  required 
-                  value={deliveryData.phone}
-                  onChange={handleInputChange("phone")}
-                />
+                <Input type="tel" required value={deliveryData.phone} onChange={handleInputChange("phone")} />
               </div>
               <div>
                 <Label>Address</Label>
-                <Input 
-                  required 
-                  value={deliveryData.address}
-                  onChange={handleInputChange("address")}
-                />
+                <Input required value={deliveryData.address} onChange={handleInputChange("address")} />
               </div>
-              {/* State Selection - Important for delivery fee calculation */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label>State *</Label>
@@ -408,9 +279,7 @@ const Checkout = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {getAllStates().map((state) => (
-                        <SelectItem key={state} value={state}>
-                          {state}
-                        </SelectItem>
+                        <SelectItem key={state} value={state}>{state}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -425,114 +294,14 @@ const Checkout = () => {
                   />
                 </div>
               </div>
-
-
               <div>
                 <Label>Postal Code (Optional)</Label>
-                <Input 
-                  value={deliveryData.postalCode}
-                  onChange={handleInputChange("postalCode")}
-                  placeholder="e.g. 200001"
-                />
+                <Input value={deliveryData.postalCode} onChange={handleInputChange("postalCode")} placeholder="e.g. 200001" />
               </div>
             </div>
           )}
+
           {step === 2 && (
-            <div className="space-y-6">
-              <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-primary" /> Payment Method
-              </h2>
-              
-              <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as "card" | "bank")} className="space-y-4">
-                <div className={`flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-colors ${paymentMethod === "card" ? "border-primary bg-primary/5" : "border-border"}`}>
-                  <RadioGroupItem value="card" id="card" />
-                  <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
-                    <CreditCard className="h-5 w-5" />
-                    <span>Credit/Debit Card</span>
-                  </Label>
-                </div>
-                <div className={`flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-colors ${paymentMethod === "bank" ? "border-primary bg-primary/5" : "border-border"}`}>
-                  <RadioGroupItem value="bank" id="bank" />
-                  <Label htmlFor="bank" className="flex items-center gap-2 cursor-pointer flex-1">
-                    <Building2 className="h-5 w-5" />
-                    <span>Bank Transfer</span>
-                  </Label>
-                </div>
-              </RadioGroup>
-
-              {paymentMethod === "card" && (
-                <div className="p-4 bg-muted rounded-lg space-y-2 mt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-primary">
-                    <CreditCard className="h-5 w-5" />
-                    <span className="font-semibold">Pay with Paystack</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    You'll be redirected to Paystack's secure payment page to complete your payment with card, bank transfer, or USSD.
-                  </p>
-                </div>
-              )}
-
-              {paymentMethod === "bank" && (
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div className="p-4 bg-muted rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold">Bank Transfer Details</h3>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Bank Name:</span>
-                        <span className="font-medium">{bankDetails.bankName}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Account Number:</span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium font-mono text-base">{bankDetails.accountNumber}</span>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-7 w-7 p-0"
-                            onClick={copyAccountNumber}
-                          >
-                            <Copy className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Account Name:</span>
-                        <span className="font-medium text-right text-sm">{bankDetails.accountName}</span>
-                      </div>
-                      <div className="flex justify-between items-center pt-2 border-t border-border/50">
-                        <span className="text-muted-foreground">Amount to Pay:</span>
-                        <span className="font-bold text-primary text-lg">{formatPrice(total)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/10">
-                      <p className="text-xs text-muted-foreground">
-                        <strong className="text-foreground">Important:</strong> Please ensure payment is made to the account above. Your order will be processed once payment is confirmed.
-                      </p>
-                    </div>
-
-                    {/* Copy Button */}
-                    <div className="mt-4">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm"
-                        className="w-full gap-2"
-                        onClick={copyAccountNumber}
-                      >
-                        <Copy className="h-4 w-4" />
-                        Copy Account Number
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          {step === 3 && (
             <div className="space-y-4">
               <h2 className="font-display text-xl font-bold">Review Your Order</h2>
               
@@ -545,12 +314,12 @@ const Checkout = () => {
                 <p className="text-sm text-muted-foreground">{deliveryData.phone}</p>
               </div>
 
-              {/* Payment Method Summary */}
+              {/* Payment Info */}
               <div className="p-4 bg-muted rounded-lg">
-                <h3 className="font-semibold text-sm mb-1">Payment Method</h3>
+                <h3 className="font-semibold text-sm mb-1">Payment</h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  {paymentMethod === "card" ? <CreditCard className="h-4 w-4" /> : <Building2 className="h-4 w-4" />}
-                  {paymentMethod === "card" ? "Credit/Debit Card" : "Bank Transfer"}
+                  <CreditCard className="h-4 w-4" />
+                  Secure payment via Paystack (Card, Bank Transfer, or USSD)
                 </p>
               </div>
 
@@ -572,95 +341,28 @@ const Checkout = () => {
               </div>
             </div>
           )}
-          <div className="flex flex-col gap-3 mt-6">
-            {/* Payment Confirmation + Receipt Upload for Bank Transfer on Review Step */}
-            {step === 3 && paymentMethod === "bank" && (
-              <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
-                {!paymentConfirmed ? (
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    onClick={() => setPaymentConfirmed(true)}
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    I Have Made Payment
-                  </Button>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                      <Upload className="h-4 w-4" />
-                      Upload your receipt
-                    </div>
-                    
-                    <input 
-                      ref={receiptInputRef}
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
-                      onChange={handleReceiptSelect} 
-                    />
 
-                    {!receiptFile ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full border-dashed border-2 h-24 flex-col gap-2"
-                        onClick={() => receiptInputRef.current?.click()}
-                      >
-                        <Upload className="h-6 w-6 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">Click to upload payment receipt</span>
-                      </Button>
-                    ) : (
-                      <div className="relative border border-border rounded-lg overflow-hidden">
-                        <img src={receiptPreview!} alt="Receipt" className="w-full max-h-48 object-contain bg-background" />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2 h-7 w-7"
-                          onClick={removeReceipt}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                        <div className="p-2 bg-muted text-xs text-muted-foreground flex items-center gap-1">
-                          <ImageIcon className="h-3 w-3" />
-                          {receiptFile.name}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {!receiptFile && (
-                      <p className="text-xs text-destructive">* You must upload your payment receipt to place your order</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            <div className="flex gap-3">
-              {step > 1 && (
-                <Button type="button" variant="outline" onClick={() => setStep(step - 1)} disabled={isSubmitting}>
-                  Back
-                </Button>
-              )}
-              <Button 
-                type="submit" 
-                className="flex-1 luxury-gradient text-primary-foreground font-semibold"
-                disabled={isSubmitting || isInitializingPayment || (step === 3 && paymentMethod === "bank" && (!paymentConfirmed || !receiptFile))}
-              >
-                {isSubmitting || isInitializingPayment ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {isInitializingPayment ? "Redirecting to Paystack..." : "Processing..."}
-                  </>
-                ) : (
-                  step === 3 ? (paymentMethod === "card" ? "Pay Now" : "Place Order") : "Continue"
-                )}
+          <div className="flex gap-3 mt-6">
+            {step > 1 && (
+              <Button type="button" variant="outline" onClick={() => setStep(step - 1)} disabled={isSubmitting}>
+                Back
               </Button>
-            </div>
+            )}
+            <Button 
+              type="submit" 
+              className="flex-1 luxury-gradient text-primary-foreground font-semibold"
+              disabled={isSubmitting || isInitializingPayment}
+            >
+              {isSubmitting || isInitializingPayment ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  {isInitializingPayment ? "Redirecting to Paystack..." : "Processing..."}
+                </>
+              ) : (
+                step === 2 ? "Pay Now" : "Continue"
+              )}
+            </Button>
           </div>
-          
         </form>
 
         <div className="bg-card p-6 rounded-xl border border-border h-fit">
@@ -676,7 +378,6 @@ const Checkout = () => {
             <span className="text-primary">{formatPrice(subtotal)}</span>
           </div>
           
-          {/* Delivery origin info */}
           <div className="pt-4 border-t border-border">
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" />
