@@ -54,7 +54,14 @@ const Auth = () => {
       toast({ title: "Welcome back!", description: "Signed in with biometrics." });
       navigate(isAdminRoute ? "/admin" : "/");
     } else {
-      toast({ title: "Biometric sign-in failed", description: error, variant: "destructive" });
+      const isNotRegistered = error?.toLowerCase().includes("no biometric credentials");
+      toast({
+        title: isNotRegistered ? "No biometric credentials found" : "Biometric sign-in failed",
+        description: isNotRegistered
+          ? "You need to register biometrics first. Sign in with your password, then go to Account > Profile to set up biometric sign-in."
+          : error,
+        variant: "destructive",
+      });
     }
   };
 
