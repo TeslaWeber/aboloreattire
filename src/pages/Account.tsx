@@ -74,27 +74,47 @@ const Account = () => {
   const [orderItems, setOrderItems] = useState<Record<string, OrderItem[]>>({});
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [hasBiometric, setHasBiometric] = useState(false);
+  const [biometricDevices, setBiometricDevices] = useState<{ id: string; device_name: string | null; created_at: string }[]>([]);
+  const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
+
+  const fetchBiometricDevices = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("webauthn_credentials")
+      .select("id, device_name, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    setBiometricDevices(data || []);
+  };
 
   useEffect(() => {
-    if (user) {
-      supabase
-        .from("webauthn_credentials")
-        .select("id")
-        .eq("user_id", user.id)
-        .then(({ data }) => setHasBiometric((data?.length || 0) > 0));
-    }
+    if (user) fetchBiometricDevices();
   }, [user]);
 
   const handleRegisterBiometric = async () => {
     if (!session?.access_token) return;
     const { success, error } = await register(session.access_token);
     if (success) {
-      setHasBiometric(true);
+      await fetchBiometricDevices();
       toast({ title: "Biometric registered!", description: "You can now sign in with fingerprint or Face ID." });
     } else {
       toast({ title: "Registration failed", description: error, variant: "destructive" });
     }
+  };
+
+  const handleRemoveDevice = async (deviceId: string) => {
+    setRemovingDeviceId(deviceId);
+    const { error } = await supabase
+      .from("webauthn_credentials")
+      .delete()
+      .eq("id", deviceId);
+    if (error) {
+      toast({ title: "Failed to remove device", description: error.message, variant: "destructive" });
+    } else {
+      setBiometricDevices((prev) => prev.filter((d) => d.id !== deviceId));
+      toast({ title: "Device removed", description: "Biometric credential has been removed." });
+    }
+    setRemovingDeviceId(null);
   };
 
   useEffect(() => {
@@ -492,30 +512,71 @@ const Account = () => {
                     <p className="mt-1">{orders.length}</p>
                   </div>
 
-                  {/* Biometric Registration */}
+                  {/* Biometric Registration & Management */}
                   {biometricSupported && (
-                    <div className="pt-4 border-t border-border">
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Biometric Sign-In
-                      </label>
-                      <p className="text-xs text-muted-foreground mt-1 mb-3">
-                        {hasBiometric
-                          ? "Fingerprint or Face ID is set up for this account."
-                          : "Set up fingerprint or Face ID for faster sign-in."}
-                      </p>
-                      <Button
-                        variant={hasBiometric ? "outline" : "default"}
-                        onClick={handleRegisterBiometric}
-                        disabled={isRegistering}
-                        className="flex items-center gap-2"
-                      >
-                        <Fingerprint className="h-4 w-4" />
-                        {isRegistering
-                          ? "Setting up..."
-                          : hasBiometric
-                          ? "Add Another Device"
-                          : "Set Up Biometric Sign-In"}
-                      </Button>
+                    <div className="pt-4 border-t border-border space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Biometric Sign-In
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1 mb-3">
+                          {biometricDevices.length > 0
+                            ? `${biometricDevices.length} device${biometricDevices.length > 1 ? "s" : ""} registered.`
+                            : "Set up fingerprint or Face ID for faster sign-in."}
+                        </p>
+                        <Button
+                          variant={biometricDevices.length > 0 ? "outline" : "default"}
+                          onClick={handleRegisterBiometric}
+                          disabled={isRegistering}
+                          className="flex items-center gap-2"
+                        >
+                          <Fingerprint className="h-4 w-4" />
+                          {isRegistering
+                            ? "Setting up..."
+                            : biometricDevices.length > 0
+                            ? "Add Another Device"
+                            : "Set Up Biometric Sign-In"}
+                        </Button>
+                      </div>
+
+                      {biometricDevices.length > 0 && (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Registered Devices
+                          </label>
+                          {biometricDevices.map((device) => (
+                            <div
+                              key={device.id}
+                              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Fingerprint className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    {device.device_name || "Biometric Device"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Added {new Date(device.created_at).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveDevice(device.id)}
+                                disabled={removingDeviceId === device.id}
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                {removingDeviceId === device.id ? "Removing..." : "Remove"}
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>
