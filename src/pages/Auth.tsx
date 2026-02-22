@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, Fingerprint } from "lucide-react";
@@ -31,6 +32,8 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   
   const [formData, setFormData] = useState({
     fullName: "",
@@ -80,6 +83,25 @@ const Auth = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email) {
+      setErrors({ email: "Please enter your email address" });
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      setResetEmailSent(true);
+      toast({ title: "Check your email", description: "We've sent you a password reset link." });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,7 +160,6 @@ const Auth = () => {
           return;
         }
 
-        // For admin route, check if it's the admin email
         if (isAdminRoute && formData.email !== "abolorecouture@gmail.com") {
           toast({
             title: "Access denied",
@@ -161,7 +182,6 @@ const Auth = () => {
             title: "Welcome to Abolore Couture!",
             description: "You have successfully signed in. Enjoy your shopping experience.",
           });
-          // Navigate immediately after successful sign-in
           if (isAdminRoute) {
             navigate("/admin");
           } else {
@@ -195,12 +215,51 @@ const Auth = () => {
             <p className="text-muted-foreground">
               {isAdminRoute 
                 ? "Sign in to access the admin dashboard" 
-                : isSignUp 
-                  ? "Create your account to start shopping" 
-                  : "Welcome back! Sign in to continue"}
+                : isForgotPassword
+                  ? "Enter your email to receive a reset link"
+                  : isSignUp 
+                    ? "Create your account to start shopping" 
+                    : "Welcome back! Sign in to continue"}
             </p>
           </div>
 
+          {isForgotPassword ? (
+            resetEmailSent ? (
+              <div className="text-center space-y-4">
+                <p className="text-muted-foreground">We've sent a password reset link to <strong>{formData.email}</strong>. Check your inbox and follow the link to set a new password.</p>
+                <Button onClick={() => { setIsForgotPassword(false); setResetEmailSent(false); }} variant="outline" className="w-full">
+                  Back to Sign In
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Enter your email"
+                      className="pl-10"
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="text-destructive text-sm mt-1">{errors.email}</p>
+                  )}
+                </div>
+                <Button type="submit" disabled={loading} className="w-full luxury-gradient text-primary-foreground font-semibold">
+                  {loading ? "Sending..." : "Send Reset Link"}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => { setIsForgotPassword(false); setErrors({}); }} className="w-full">
+                  Back to Sign In
+                </Button>
+              </form>
+            )
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <AnimatePresence mode="wait">
               {isSignUp && !isAdminRoute && (
@@ -249,7 +308,18 @@ const Auth = () => {
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                {!isSignUp && !isAdminRoute && (
+                  <button
+                    type="button"
+                    onClick={() => { setIsForgotPassword(true); setErrors({}); }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -323,6 +393,7 @@ const Auth = () => {
               </Button>
             )}
           </form>
+          )}
 
           {!isAdminRoute && (
             <div className="mt-6 text-center">
