@@ -93,6 +93,17 @@ const Account = () => {
 
   const handleRegisterBiometric = async () => {
     if (!session?.access_token) return;
+
+    // WebAuthn doesn't work inside iframes (e.g. Lovable preview)
+    if (window.self !== window.top) {
+      toast({
+        title: "Open in new tab",
+        description: "Biometric registration requires opening the app directly. Please tap the arrow icon to open in a new tab, then try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { success, error } = await register(session.access_token);
     if (success) {
       await fetchBiometricDevices();
