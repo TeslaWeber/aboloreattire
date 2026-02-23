@@ -48,6 +48,14 @@ const Auth = () => {
   const { isSupported: biometricSupported, isAuthenticating, authenticate } = useBiometricAuth();
 
   const handleBiometricSignIn = async () => {
+    if (window.self !== window.top) {
+      toast({
+        title: "Open in new tab",
+        description: "Biometric sign-in requires opening the app directly. Please tap the arrow icon to open in a new tab, then try again.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!formData.email) {
       setErrors({ email: "Please enter your email first" });
       return;
