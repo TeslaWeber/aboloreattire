@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -16,10 +16,11 @@ interface AuthRequiredDialogProps {
 
 const AuthRequiredDialog = ({ open, onOpenChange }: AuthRequiredDialogProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignIn = () => {
     onOpenChange(false);
-    navigate("/auth");
+    navigate(`/auth?redirect=${encodeURIComponent(location.pathname)}`);
   };
 
   return (

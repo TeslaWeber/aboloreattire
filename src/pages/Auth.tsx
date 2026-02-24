@@ -29,6 +29,7 @@ const signUpSchema = z.object({
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const isAdminRoute = searchParams.get("type") === "admin";
+  const redirectTo = searchParams.get("redirect") || "/";
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,7 +66,7 @@ const Auth = () => {
     const { success, error } = await authenticate(formData.email);
     if (success) {
       toast({ title: "Welcome back!", description: "Signed in with biometrics." });
-      navigate(isAdminRoute ? "/admin" : "/");
+      navigate(isAdminRoute ? "/admin" : redirectTo);
     } else {
       const isNotRegistered = error?.toLowerCase().includes("no biometric credentials");
       toast({
@@ -80,15 +81,14 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      if (isAdminRoute) {
-        if (isAdmin) {
-          navigate("/admin");
-        }
-      } else {
-        navigate("/");
-      }
+      const storedRedirect = sessionStorage.getItem("auth_redirect");
+      if (storedRedirect) sessionStorage.removeItem("auth_redirect");
+      const destination = isAdminRoute ? "/admin" : (storedRedirect || redirectTo);
+      
+      if (isAdminRoute && !isAdmin) return;
+      navigate(destination);
     }
-  }, [user, isAdmin, isAdminRoute, navigate]);
+  }, [user, isAdmin, isAdminRoute, navigate, redirectTo]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -154,7 +154,7 @@ const Auth = () => {
             title: "Welcome to Abolore Couture!",
             description: "Your account has been successfully created. Enjoy your shopping experience.",
           });
-          navigate("/");
+          navigate(redirectTo);
         }
       } else {
         const result = signInSchema.safeParse(formData);
@@ -195,7 +195,7 @@ const Auth = () => {
           if (isAdminRoute) {
             navigate("/admin");
           } else {
-            navigate("/");
+            navigate(redirectTo);
           }
         }
       }
@@ -421,6 +421,7 @@ const Auth = () => {
                     disabled={!!oauthLoading}
                     onClick={async () => {
                       setOauthLoading("google");
+                      sessionStorage.setItem("auth_redirect", redirectTo);
                       const { error } = await lovable.auth.signInWithOAuth("google", {
                         redirect_uri: window.location.origin,
                       });
@@ -454,6 +455,7 @@ const Auth = () => {
                     disabled={!!oauthLoading}
                     onClick={async () => {
                       setOauthLoading("apple");
+                      sessionStorage.setItem("auth_redirect", redirectTo);
                       const { error } = await lovable.auth.signInWithOAuth("apple", {
                         redirect_uri: window.location.origin,
                       });

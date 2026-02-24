@@ -80,7 +80,7 @@ const Checkout = () => {
         description: "You need to be signed in to place an order.",
         variant: "destructive",
       });
-      navigate("/auth");
+      navigate("/auth?redirect=/checkout");
       return false;
     }
 
@@ -204,7 +204,7 @@ const Checkout = () => {
         <h1 className="font-display text-3xl font-bold mb-4">Please Sign In</h1>
         <p className="text-muted-foreground mb-6">You need to be signed in to complete your checkout.</p>
         <Button asChild>
-          <Link to="/auth">Sign In</Link>
+          <Link to="/auth?redirect=/checkout">Sign In</Link>
         </Button>
       </div>
     );
