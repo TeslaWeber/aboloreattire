@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -42,15 +43,29 @@ const ImageTransformDialog = ({
     setPreviewUrl(null);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("You must be logged in");
+      }
+
+      // Map prompt to preset
+      const presetMap: Record<string, string> = {
+        "Place this clothing item on a mannequin in a professional studio with a clean white background": "mannequin_white",
+        "Show this clothing worn on a mannequin with a grass carpet wall and floor background, elegant studio lighting": "mannequin_grass",
+        "Display this garment on a mannequin in a modern boutique setting with warm ambient lighting": "mannequin_boutique",
+        "Transform this into a flat-lay product photo on a marble surface with accessories": "flat_lay",
+      };
+      const preset = presetMap[prompt] || "mannequin_grass";
+
       const resp = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/transform-image`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ imageUrl, prompt }),
+          body: JSON.stringify({ imageUrl, preset }),
         }
       );
 

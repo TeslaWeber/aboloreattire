@@ -79,7 +79,8 @@ serve(async (req) => {
         });
 
       if (insertError) {
-        return new Response(JSON.stringify({ error: insertError.message }), {
+        console.error("Insert error:", insertError);
+        return new Response(JSON.stringify({ error: "Failed to register credential" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -95,7 +96,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("webauthn-register error:", err);
+    return new Response(JSON.stringify({ error: "An error occurred. Please try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
