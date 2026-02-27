@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Users, Search, Mail, Phone } from "lucide-react";
+import { Users, Search, Mail, Phone, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface Profile {
@@ -15,9 +15,10 @@ interface Profile {
 
 interface AdminCustomersProps {
   customers: Profile[];
+  orderCounts?: Record<string, number>;
 }
 
-const AdminCustomers = ({ customers }: AdminCustomersProps) => {
+const AdminCustomers = ({ customers, orderCounts = {} }: AdminCustomersProps) => {
   const [search, setSearch] = useState("");
 
   const filtered = customers.filter((c) =>
@@ -77,9 +78,17 @@ const AdminCustomers = ({ customers }: AdminCustomersProps) => {
                   )}
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground sm:ml-auto flex-shrink-0">
-                Joined {new Date(profile.created_at).toLocaleDateString()}
-              </p>
+              <div className="flex items-center gap-3 sm:ml-auto flex-shrink-0">
+                <div className="flex items-center gap-1">
+                  <ShoppingBag className="h-3 w-3 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">
+                    {orderCounts[profile.email] || 0} orders
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Joined {new Date(profile.created_at).toLocaleDateString()}
+                </p>
+              </div>
             </div>
           ))}
         </div>
