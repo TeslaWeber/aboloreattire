@@ -82,7 +82,7 @@ const OrderDetailsDialog = ({
           {/* Customer Info */}
           <div>
             <h3 className="font-semibold mb-2">Customer Information</h3>
-            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+            <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-sm break-all">
               <p><span className="text-muted-foreground">Name:</span> {order.customer_name}</p>
               <p><span className="text-muted-foreground">Email:</span> {order.customer_email}</p>
               <p><span className="text-muted-foreground">Phone:</span> {order.customer_phone}</p>
@@ -92,7 +92,7 @@ const OrderDetailsDialog = ({
           {/* Delivery Info */}
           <div>
             <h3 className="font-semibold mb-2">Delivery Information</h3>
-            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+            <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-sm break-all">
               <p><span className="text-muted-foreground">Address:</span> {order.delivery_address}</p>
               <p><span className="text-muted-foreground">City:</span> {order.delivery_city}</p>
               <p><span className="text-muted-foreground">State:</span> {order.delivery_state}</p>
@@ -107,18 +107,18 @@ const OrderDetailsDialog = ({
             ) : orderItems.length === 0 ? (
               <p className="text-muted-foreground">No items found.</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {orderItems.map((item) => (
-                  <div key={item.id} className="flex gap-3 bg-muted/50 rounded-lg p-3">
+                  <div key={item.id} className="flex gap-2 bg-muted/50 rounded-lg p-2">
                     {item.product_image && (
                       <img
                         src={item.product_image}
                         alt={item.product_name}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-12 h-12 object-cover rounded flex-shrink-0"
                       />
                     )}
-                    <div className="flex-1">
-                      <p className="font-medium">{item.product_name}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{item.product_name}</p>
                       <div className="flex gap-2 mt-1">
                         {item.size && (
                           <Badge variant="secondary" className="text-xs">Size: {item.size}</Badge>
@@ -139,7 +139,7 @@ const OrderDetailsDialog = ({
           {/* Payment & Summary */}
           <div>
             <h3 className="font-semibold mb-2">Payment & Summary</h3>
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+            <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-sm">
               <p><span className="text-muted-foreground">Payment Method:</span> {order.payment_method}</p>
               <p className="flex items-center gap-2">
                 <span className="text-muted-foreground">Order Status:</span> 
