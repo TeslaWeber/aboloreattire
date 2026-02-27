@@ -6,8 +6,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/data/products";
+import { Download } from "lucide-react";
 
 interface Order {
   id: string;
@@ -24,8 +26,8 @@ interface Order {
   delivery_fee: number;
   total: number;
   notes: string | null;
+  receipt_url: string | null;
   created_at: string;
-  
 }
 
 interface OrderItem {
@@ -193,6 +195,17 @@ const OrderDetailsDialog = ({
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-muted-foreground">{order.notes}</p>
               </div>
+            </div>
+          )}
+
+          {order.receipt_url && (
+            <div className="flex justify-center">
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <a href={order.receipt_url} target="_blank" rel="noopener noreferrer">
+                  <Download className="h-4 w-4" />
+                  Download Receipt
+                </a>
+              </Button>
             </div>
           )}
 
