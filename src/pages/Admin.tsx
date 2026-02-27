@@ -58,6 +58,12 @@ const Admin = () => {
   const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const pendingOrders = orders.filter((o) => o.status === "pending").length;
 
+  const orderCounts = orders.reduce<Record<string, number>>((acc, o) => {
+    const email = o.customer_email;
+    acc[email] = (acc[email] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
     <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === "dashboard" && (
@@ -80,7 +86,7 @@ const Admin = () => {
         <AdminOrders orders={orders} onRefresh={fetchOrders} />
       )}
       {activeTab === "customers" && (
-        <AdminCustomers customers={customers} />
+        <AdminCustomers customers={customers} orderCounts={orderCounts} />
       )}
     </AdminLayout>
   );
