@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Search, Mail, Phone, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import CustomerOrdersDialog from "./CustomerOrdersDialog";
 
 interface Profile {
   id: string;
@@ -20,6 +21,7 @@ interface AdminCustomersProps {
 
 const AdminCustomers = ({ customers, orderCounts = {} }: AdminCustomersProps) => {
   const [search, setSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<Profile | null>(null);
 
   const filtered = customers.filter((c) =>
     (c.full_name || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -52,9 +54,10 @@ const AdminCustomers = ({ customers, orderCounts = {} }: AdminCustomersProps) =>
       ) : (
         <div className="grid gap-3">
           {filtered.map((profile) => (
-            <div
+            <button
               key={profile.id}
-              className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:border-primary/30 transition-colors overflow-hidden"
+              onClick={() => setSelectedCustomer(profile)}
+              className="w-full text-left bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:border-primary/30 transition-colors overflow-hidden cursor-pointer"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -89,10 +92,16 @@ const AdminCustomers = ({ customers, orderCounts = {} }: AdminCustomersProps) =>
                   Joined {new Date(profile.created_at).toLocaleDateString()}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
+
+      <CustomerOrdersDialog
+        open={!!selectedCustomer}
+        onOpenChange={(open) => !open && setSelectedCustomer(null)}
+        customer={selectedCustomer}
+      />
     </motion.div>
   );
 };
