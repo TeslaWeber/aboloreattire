@@ -45,6 +45,7 @@ interface Order {
   delivery_fee: number;
   total: number;
   notes: string | null;
+  receipt_url: string | null;
   created_at: string;
   
 }
