@@ -53,33 +53,33 @@ const AdminCustomers = ({ customers }: AdminCustomersProps) => {
           {filtered.map((profile) => (
             <div
               key={profile.id}
-              className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 hover:border-primary/30 transition-colors"
+              className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:border-primary/30 transition-colors overflow-hidden"
             >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span className="font-bold text-primary text-lg">
-                  {(profile.full_name || profile.email)[0].toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold truncate">
-                  {profile.full_name || "No name provided"}
-                </h3>
-                <div className="flex items-center gap-1 mt-1">
-                  <Mail className="h-3 w-3 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground truncate">{profile.email}</p>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="font-bold text-primary text-sm">
+                    {(profile.full_name || profile.email)[0].toUpperCase()}
+                  </span>
                 </div>
-                {profile.phone && (
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold truncate text-sm">
+                    {profile.full_name || "No name provided"}
+                  </h3>
                   <div className="flex items-center gap-1 mt-0.5">
-                    <Phone className="h-3 w-3 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">{profile.phone}</p>
+                    <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                    <p className="text-xs text-muted-foreground truncate">{profile.email}</p>
                   </div>
-                )}
+                  {profile.phone && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                      <p className="text-xs text-muted-foreground">{profile.phone}</p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <p className="text-xs text-muted-foreground">
-                  Joined {new Date(profile.created_at).toLocaleDateString()}
-                </p>
-              </div>
+              <p className="text-xs text-muted-foreground sm:ml-auto flex-shrink-0">
+                Joined {new Date(profile.created_at).toLocaleDateString()}
+              </p>
             </div>
           ))}
         </div>
