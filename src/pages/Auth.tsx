@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, User, Fingerprint } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { useBiometricAuth } from "@/hooks/useBiometricAuth";
 import { z } from "zod";
+
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -49,36 +49,6 @@ const Auth = () => {
   const { user, signIn, signUp, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isSupported: biometricSupported, isAuthenticating, authenticate } = useBiometricAuth();
-
-  const handleBiometricSignIn = async () => {
-    if (window.self !== window.top) {
-      toast({
-        title: "Open in new tab",
-        description: "Biometric sign-in requires opening the app directly. Please tap the arrow icon to open in a new tab, then try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (!formData.email) {
-      setErrors({ email: "Please enter your email first" });
-      return;
-    }
-    const { success, error } = await authenticate(formData.email);
-    if (success) {
-      toast({ title: "Welcome back!", description: "Signed in with biometrics." });
-      navigate(isAdminRoute ? "/admin" : redirectTo);
-    } else {
-      const isNotRegistered = error?.toLowerCase().includes("no biometric credentials");
-      toast({
-        title: isNotRegistered ? "No biometric credentials found" : "Biometric sign-in failed",
-        description: isNotRegistered
-          ? "You need to register biometrics first. Sign in with your password, then go to Account > Profile to set up biometric sign-in."
-          : error,
-        variant: "destructive",
-      });
-    }
-  };
 
   useEffect(() => {
     if (user) {
@@ -411,19 +381,6 @@ const Auth = () => {
             >
               {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
             </Button>
-
-            {biometricSupported && !isSignUp && (
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isAuthenticating}
-                onClick={handleBiometricSignIn}
-                className="w-full flex items-center gap-2"
-              >
-                <Fingerprint className="h-5 w-5" />
-                {isAuthenticating ? "Verifying..." : "Sign in with Fingerprint / Face ID"}
-              </Button>
-            )}
 
             {!isAdminRoute && (
               <>

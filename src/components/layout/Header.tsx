@@ -17,10 +17,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
   const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -119,7 +130,7 @@ const Header = () => {
               </h1>
             </Link>
 
-            {/* Desktop Navigation - minimal */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
               <Link to="/products" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
                 All Products
@@ -211,7 +222,7 @@ const Header = () => {
                   </Link>
                 )}
                 <button
-                  onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }}
+                  onClick={() => { setIsMobileMenuOpen(false); setSignOutDialogOpen(true); }}
                   className="block w-full text-left py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
                 >
                   Sign Out
@@ -271,6 +282,22 @@ const Header = () => {
 
       {/* Search Dialog */}
       <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+
+      {/* Sign Out Confirmation */}
+      <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will need to sign in again to access your account and place orders.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSignOut}>Sign Out</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 };

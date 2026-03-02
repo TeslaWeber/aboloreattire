@@ -7,6 +7,7 @@ import DashboardStats from "@/components/admin/DashboardStats";
 import AdminProducts from "@/components/admin/AdminProducts";
 import AdminOrders from "@/components/admin/AdminOrders";
 import AdminCustomers from "@/components/admin/AdminCustomers";
+import AdminSettings from "@/components/admin/AdminSettings";
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
@@ -87,6 +88,9 @@ const Admin = () => {
       )}
       {activeTab === "customers" && (
         <AdminCustomers customers={customers} orderCounts={orderCounts} />
+      )}
+      {activeTab === "settings" && (
+        <AdminSettings />
       )}
     </AdminLayout>
   );
