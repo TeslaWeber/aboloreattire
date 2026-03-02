@@ -9,10 +9,21 @@ import {
   Menu,
   X,
   Store,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -25,15 +36,16 @@ const navItems = [
   { id: "products", label: "Products", icon: Package },
   { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "customers", label: "Customers", icon: Users },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
-  // Track new orders for notification dot
   useEffect(() => {
     const lastCheck = localStorage.getItem('admin-last-order-check');
     const fetchNewOrders = async () => {
@@ -113,7 +125,7 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
             <Store className="h-5 w-5" />
             Back to Store
           </Link>
-          <Button variant="outline" className="w-full" onClick={handleLogout}>
+          <Button variant="outline" className="w-full" onClick={() => setSignOutDialogOpen(true)}>
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
@@ -127,7 +139,7 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
             <Menu className="h-6 w-6" />
           </button>
           <h1 className="font-display text-lg font-bold luxury-text-gradient">Admin</h1>
-          <button onClick={handleLogout}>
+          <button onClick={() => setSignOutDialogOpen(true)}>
             <LogOut className="h-5 w-5 text-muted-foreground" />
           </button>
         </header>
@@ -138,6 +150,22 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
+
+      {/* Sign Out Confirmation */}
+      <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will be logged out of the admin dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>Sign Out</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

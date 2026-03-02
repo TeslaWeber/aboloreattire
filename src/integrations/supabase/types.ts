@@ -224,6 +224,27 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -238,36 +259,6 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      webauthn_credentials: {
-        Row: {
-          counter: number
-          created_at: string
-          credential_id: string
-          device_name: string | null
-          id: string
-          public_key: string
-          user_id: string
-        }
-        Insert: {
-          counter?: number
-          created_at?: string
-          credential_id: string
-          device_name?: string | null
-          id?: string
-          public_key: string
-          user_id: string
-        }
-        Update: {
-          counter?: number
-          created_at?: string
-          credential_id?: string
-          device_name?: string | null
-          id?: string
-          public_key?: string
           user_id?: string
         }
         Relationships: []

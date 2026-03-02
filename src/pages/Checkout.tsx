@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Check, CreditCard, Truck, Loader2, MapPin } from "lucide-react";
+import { Check, CreditCard, Truck, Loader2, MapPin, Upload, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,11 @@ const Checkout = () => {
   const [step, setStep] = useState(1);
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMode, setPaymentMode] = useState<string>("paystack");
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [deliveryData, setDeliveryData] = useState<DeliveryFormData>({
     firstName: "",
     lastName: "",
@@ -53,6 +58,19 @@ const Checkout = () => {
     zone: DeliveryZone | null;
     estimatedDays: string;
   }>({ fee: 0, zone: null, estimatedDays: "" });
+
+  // Fetch payment mode from settings
+  useEffect(() => {
+    const fetchPaymentMode = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "payment_mode")
+        .maybeSingle();
+      if (data) setPaymentMode(data.value);
+    };
+    fetchPaymentMode();
+  }, []);
 
   useEffect(() => {
     if (deliveryData.state) {
@@ -73,19 +91,106 @@ const Checkout = () => {
     setDeliveryData(prev => ({ ...prev, [field]: e.target.value }));
   };
 
-  const saveOrderToDatabase = async (): Promise<string | false> => {
+  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
+      return;
+    }
+    setReceiptFile(file);
+    setReceiptPreview(URL.createObjectURL(file));
+  };
+
+  const uploadReceiptAndSubmit = async (): Promise<string | false> => {
     if (!user) {
+      toast({ title: "Please sign in", description: "You need to be signed in to place an order.", variant: "destructive" });
+      navigate("/auth?redirect=/checkout");
+      return false;
+    }
+    if (!receiptFile) {
+      toast({ title: "Receipt required", description: "Please upload your payment receipt screenshot.", variant: "destructive" });
+      return false;
+    }
+
+    setUploadingReceipt(true);
+    try {
+      // Save order first
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          user_id: user.id,
+          customer_name: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          customer_email: deliveryData.email,
+          customer_phone: deliveryData.phone,
+          delivery_address: deliveryData.address,
+          delivery_city: deliveryData.city,
+          delivery_state: deliveryData.state,
+          payment_method: "Receipt Upload",
+          subtotal,
+          delivery_fee: delivery,
+          total,
+          status: "pending",
+          payment_status: "pending",
+        })
+        .select()
+        .single();
+
+      if (orderError) throw new Error(orderError.message);
+
+      // Upload receipt
+      const fileExt = receiptFile.name.split(".").pop();
+      const fileName = `${order.id}-${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from("payment-receipts")
+        .upload(fileName, receiptFile);
+
+      if (uploadError) throw new Error(uploadError.message);
+
+      const { data: { publicUrl } } = supabase.storage.from("payment-receipts").getPublicUrl(fileName);
+
+      // Update order with receipt URL
+      await supabase.from("orders").update({ receipt_url: publicUrl }).eq("id", order.id);
+
+      // Save order items
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_id: item.product.id,
+        product_name: item.product.name,
+        product_image: item.product.images?.[0] || null,
+        quantity: item.quantity,
+        price: item.product.price,
+        size: item.size || null,
+        color: item.color || null,
+      }));
+
+      const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
+      if (itemsError) throw new Error(itemsError.message);
+
+      clearCart();
+      toast({ title: "Order Placed!", description: "Your order has been submitted. We'll verify your payment shortly." });
+      navigate("/payment-success?method=receipt");
+      return order.id;
+    } catch (error) {
       toast({
-        title: "Please sign in",
-        description: "You need to be signed in to place an order.",
+        title: "Order Failed",
+        description: error instanceof Error ? error.message : "Failed to place order.",
         variant: "destructive",
       });
+      return false;
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
+  const saveOrderToDatabase = async (): Promise<string | false> => {
+    if (!user) {
+      toast({ title: "Please sign in", description: "You need to be signed in to place an order.", variant: "destructive" });
       navigate("/auth?redirect=/checkout");
       return false;
     }
 
     setIsSubmitting(true);
-
     try {
       const { data: order, error: orderError } = await supabase
         .from("orders")
@@ -98,18 +203,15 @@ const Checkout = () => {
           delivery_city: deliveryData.city,
           delivery_state: deliveryData.state,
           payment_method: "Paystack",
-          subtotal: subtotal,
+          subtotal,
           delivery_fee: delivery,
-          total: total,
+          total,
           status: "pending",
         })
         .select()
         .single();
 
-      if (orderError) {
-        console.error("Order error:", orderError);
-        throw new Error(orderError.message);
-      }
+      if (orderError) throw new Error(orderError.message);
 
       const orderItems = items.map(item => ({
         order_id: order.id,
@@ -122,21 +224,14 @@ const Checkout = () => {
         color: item.color || null,
       }));
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) {
-        console.error("Order items error:", itemsError);
-        throw new Error(itemsError.message);
-      }
+      const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
+      if (itemsError) throw new Error(itemsError.message);
 
       return order.id;
     } catch (error) {
-      console.error("Error saving order:", error);
       toast({
         title: "Order Failed",
-        description: error instanceof Error ? error.message : "Failed to place order. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to place order.",
         variant: "destructive",
       });
       return false;
@@ -164,12 +259,7 @@ const Checkout = () => {
         throw new Error("No payment URL received");
       }
     } catch (error) {
-      console.error("Payment initialization error:", error);
-      toast({
-        title: "Payment Error",
-        description: "Failed to initialize payment. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Payment Error", description: "Failed to initialize payment. Please try again.", variant: "destructive" });
     } finally {
       setIsInitializingPayment(false);
     }
@@ -179,11 +269,7 @@ const Checkout = () => {
     e.preventDefault();
     
     if (step === 1 && !deliveryData.state) {
-      toast({
-        title: "State Required",
-        description: "Please select your state to calculate delivery fee.",
-        variant: "destructive",
-      });
+      toast({ title: "State Required", description: "Please select your state to calculate delivery fee.", variant: "destructive" });
       return;
     }
     
@@ -192,10 +278,13 @@ const Checkout = () => {
       return; 
     }
 
-    // Final step - place the order and redirect to Paystack
-    const orderId = await saveOrderToDatabase();
-    if (!orderId) return;
-    await initializePaystackPayment(orderId);
+    if (paymentMode === "receipt_upload") {
+      await uploadReceiptAndSubmit();
+    } else {
+      const orderId = await saveOrderToDatabase();
+      if (!orderId) return;
+      await initializePaystackPayment(orderId);
+    }
   };
 
   if (!user) {
@@ -317,10 +406,47 @@ const Checkout = () => {
               {/* Payment Info */}
               <div className="p-4 bg-muted rounded-lg">
                 <h3 className="font-semibold text-sm mb-1">Payment</h3>
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  Secure payment via Paystack (Card, Bank Transfer, or USSD)
-                </p>
+                {paymentMode === "paystack" ? (
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Secure payment via Paystack (Card, Bank Transfer, or USSD)
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload a screenshot of your payment receipt
+                    </p>
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleReceiptSelect}
+                        className="hidden"
+                      />
+                      {receiptPreview ? (
+                        <div className="space-y-2">
+                          <img
+                            src={receiptPreview}
+                            alt="Receipt preview"
+                            className="max-h-48 mx-auto rounded-lg object-contain"
+                          />
+                          <p className="text-xs text-muted-foreground">Tap to change</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 py-2">
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">Tap to upload receipt screenshot</p>
+                          <p className="text-xs text-muted-foreground">JPG, PNG supported</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Order Items */}
@@ -351,15 +477,15 @@ const Checkout = () => {
             <Button 
               type="submit" 
               className="flex-1 luxury-gradient text-primary-foreground font-semibold"
-              disabled={isSubmitting || isInitializingPayment}
+              disabled={isSubmitting || isInitializingPayment || uploadingReceipt}
             >
-              {isSubmitting || isInitializingPayment ? (
+              {isSubmitting || isInitializingPayment || uploadingReceipt ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {isInitializingPayment ? "Redirecting to Paystack..." : "Processing..."}
+                  {uploadingReceipt ? "Submitting Order..." : isInitializingPayment ? "Redirecting to Paystack..." : "Processing..."}
                 </>
               ) : (
-                step === 2 ? "Pay Now" : "Continue"
+                step === 2 ? (paymentMode === "paystack" ? "Pay Now" : "Submit Order") : "Continue"
               )}
             </Button>
           </div>
