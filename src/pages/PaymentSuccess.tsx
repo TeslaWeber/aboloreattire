@@ -9,15 +9,16 @@ const PaymentSuccess = () => {
   const { clearCart } = useCart();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const reference = searchParams.get("reference") || searchParams.get("trxref");
+  const method = searchParams.get("method");
 
   useEffect(() => {
-    if (reference) {
+    if (reference || method === "receipt") {
       clearCart();
       setStatus("success");
     } else {
       setStatus("error");
     }
-  }, [reference]);
+  }, [reference, method]);
 
   if (status === "loading") {
     return (
@@ -42,9 +43,13 @@ const PaymentSuccess = () => {
   return (
     <div className="container mx-auto px-4 py-16 text-center">
       <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
-      <h1 className="font-display text-3xl font-bold mb-2">Payment Successful!</h1>
+      <h1 className="font-display text-3xl font-bold mb-2">
+        {method === "receipt" ? "Order Submitted!" : "Payment Successful!"}
+      </h1>
       <p className="text-muted-foreground mb-2">
-        Your payment has been received and your order is being processed.
+        {method === "receipt" 
+          ? "Your order has been submitted. We'll verify your payment receipt and process your order shortly."
+          : "Your payment has been received and your order is being processed."}
       </p>
       {reference && (
         <p className="text-sm text-muted-foreground mb-6">Reference: {reference}</p>
