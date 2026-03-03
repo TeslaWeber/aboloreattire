@@ -424,12 +424,13 @@ const Checkout = () => {
                             navigator.clipboard.writeText("0017708379");
                             toast({ title: "Copied!", description: "Account number copied to clipboard." });
                           }}
-                          className="text-xs text-primary hover:underline font-medium"
+                          className="text-primary hover:text-primary/80 transition-colors"
+                          aria-label="Copy account number"
                         >
-                          Copy
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                         </button>
                       </p>
-                      <p className="text-sm"><span className="text-muted-foreground">Acc. Name:</span> Suliyat Titilope Abdullahi</p>
+                      <p className="text-sm"><span className="text-muted-foreground">Acc. Name:</span> Suliyat Titilope</p>
                       <p className="text-sm font-semibold text-primary mt-2">Amount: {formatPrice(total)}</p>
                     </div>
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
