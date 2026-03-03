@@ -73,6 +73,63 @@ Deno.serve(async (req) => {
 
       console.log(`Order ${orderId} payment confirmed`);
 
+      // Send admin email notification
+      try {
+        const { data: order } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("id", orderId)
+          .single();
+
+        if (order) {
+          const { data: orderItems } = await supabase
+            .from("order_items")
+            .select("*")
+            .eq("order_id", orderId);
+
+          const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+          const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+          const projectId = SUPABASE_URL.replace("https://", "").replace(".supabase.co", "");
+
+          if (LOVABLE_API_KEY) {
+            const itemsList = (orderItems || [])
+              .map((i: any) => `• ${i.product_name} (x${i.quantity}) - ₦${Number(i.price * i.quantity).toLocaleString()}`)
+              .join("\n");
+
+            const emailHtml = `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #16a34a; border-bottom: 2px solid #e5e5e5; padding-bottom: 10px;">✅ Payment Confirmed via Paystack!</h2>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                  <p><strong>Order ID:</strong> ${orderId}</p>
+                  <p><strong>Customer:</strong> ${order.customer_name}</p>
+                  <p><strong>Email:</strong> ${order.customer_email}</p>
+                  <p><strong>Phone:</strong> ${order.customer_phone}</p>
+                  <p><strong>Delivery:</strong> ${order.delivery_city}, ${order.delivery_state}</p>
+                  <p style="font-size: 18px; color: #16a34a;"><strong>Total: ₦${Number(order.total).toLocaleString()}</strong></p>
+                </div>
+                ${itemsList ? `<div style="background: #fff; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;"><h3>Items:</h3><pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre></div>` : ""}
+              </div>
+            `;
+
+            await fetch(`https://api.lovable.dev/v1/projects/${projectId}/emails/send`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                to: "abolorecouture@gmail.com",
+                subject: `✅ Payment Confirmed - ${order.customer_name} - ₦${Number(order.total).toLocaleString()}`,
+                html: emailHtml,
+                purpose: "transactional",
+              }),
+            });
+          }
+        }
+      } catch (notifyError) {
+        console.error("Admin notification error:", notifyError);
+      }
+
       // Send WhatsApp notification if configured
       try {
         const WHATSAPP_ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");

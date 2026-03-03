@@ -6,10 +6,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/data/products";
-import { Download } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface Order {
   id: string;
@@ -46,16 +45,18 @@ interface OrderDetailsDialogProps {
   order: Order | null;
 }
 
-const OrderDetailsDialog = ({
-  open,
-  onOpenChange,
-  order,
-}: OrderDetailsDialogProps) => {
+const OrderDetailsDialog = ({ open, onOpenChange, order }: OrderDetailsDialogProps) => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [receiptLoading, setReceiptLoading] = useState(false);
+
   useEffect(() => {
     if (open && order) {
       fetchOrderItems();
+      fetchReceiptUrl();
+    } else {
+      setReceiptUrl(null);
     }
   }, [open, order]);
 
@@ -70,6 +71,25 @@ const OrderDetailsDialog = ({
     setLoading(false);
   };
 
+  const fetchReceiptUrl = async () => {
+    if (!order?.receipt_url) return;
+    setReceiptLoading(true);
+    try {
+      // Check if it's a file path (no http) or a full URL
+      const isFilePath = !order.receipt_url.startsWith("http");
+      if (isFilePath) {
+        const { data, error } = await supabase.storage
+          .from("payment-receipts")
+          .createSignedUrl(order.receipt_url, 3600);
+        if (!error && data) setReceiptUrl(data.signedUrl);
+      } else {
+        setReceiptUrl(order.receipt_url);
+      }
+    } catch {
+      console.error("Failed to load receipt");
+    }
+    setReceiptLoading(false);
+  };
 
   if (!order) return null;
 
@@ -122,12 +142,8 @@ const OrderDetailsDialog = ({
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.product_name}</p>
                       <div className="flex gap-2 mt-1">
-                        {item.size && (
-                          <Badge variant="secondary" className="text-xs">Size: {item.size}</Badge>
-                        )}
-                        {item.color && (
-                          <Badge variant="secondary" className="text-xs">Color: {item.color}</Badge>
-                        )}
+                        {item.size && <Badge variant="secondary" className="text-xs">Size: {item.size}</Badge>}
+                        {item.color && <Badge variant="secondary" className="text-xs">Color: {item.color}</Badge>}
                         <Badge variant="outline" className="text-xs">Qty: {item.quantity}</Badge>
                       </div>
                       <p className="text-primary font-bold mt-1">{formatPrice(item.price * item.quantity)}</p>
@@ -138,14 +154,36 @@ const OrderDetailsDialog = ({
             )}
           </div>
 
+          {/* Payment Receipt */}
+          {order.receipt_url && (
+            <div>
+              <h3 className="font-semibold mb-2">Payment Receipt</h3>
+              {receiptLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : receiptUrl ? (
+                <div className="rounded-lg overflow-hidden border border-border">
+                  <img
+                    src={receiptUrl}
+                    alt="Payment receipt"
+                    className="w-full max-h-96 object-contain bg-muted/30"
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Unable to load receipt.</p>
+              )}
+            </div>
+          )}
+
           {/* Payment & Summary */}
           <div>
             <h3 className="font-semibold mb-2">Payment & Summary</h3>
             <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-sm">
               <p><span className="text-muted-foreground">Payment Method:</span> {order.payment_method}</p>
               <p className="flex items-center gap-2">
-                <span className="text-muted-foreground">Order Status:</span> 
-                <Badge 
+                <span className="text-muted-foreground">Order Status:</span>
+                <Badge
                   variant="secondary"
                   className={`${
                     order.status === "delivered" ? "bg-green-500/20 text-green-500" :
@@ -159,8 +197,8 @@ const OrderDetailsDialog = ({
                 </Badge>
               </p>
               <p className="flex items-center gap-2">
-                <span className="text-muted-foreground">Payment Status:</span> 
-                <Badge 
+                <span className="text-muted-foreground">Payment Status:</span>
+                <Badge
                   variant="secondary"
                   className={`${
                     order.payment_status === "confirmed" ? "bg-green-500/20 text-green-500" :
@@ -188,24 +226,12 @@ const OrderDetailsDialog = ({
             </div>
           </div>
 
-
           {order.notes && (
             <div>
               <h3 className="font-semibold mb-2">Order Notes</h3>
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-muted-foreground">{order.notes}</p>
               </div>
-            </div>
-          )}
-
-          {order.receipt_url && (
-            <div className="flex justify-center">
-              <Button asChild variant="outline" size="sm" className="gap-2">
-                <a href={order.receipt_url} target="_blank" rel="noopener noreferrer">
-                  <Download className="h-4 w-4" />
-                  Download Receipt
-                </a>
-              </Button>
             </div>
           )}
 

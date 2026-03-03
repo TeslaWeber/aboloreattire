@@ -147,10 +147,8 @@ const Checkout = () => {
 
       if (uploadError) throw new Error(uploadError.message);
 
-      const { data: { publicUrl } } = supabase.storage.from("payment-receipts").getPublicUrl(fileName);
-
-      // Update order with receipt URL
-      await supabase.from("orders").update({ receipt_url: publicUrl }).eq("id", order.id);
+      // Store the file path (not public URL) since bucket is private
+      await supabase.from("orders").update({ receipt_url: fileName }).eq("id", order.id);
 
       // Save order items
       const orderItems = items.map(item => ({
@@ -166,6 +164,21 @@ const Checkout = () => {
 
       const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
       if (itemsError) throw new Error(itemsError.message);
+
+      // Send admin notification
+      supabase.functions.invoke("notify-admin-order", {
+        body: {
+          orderId: order.id,
+          customerName: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          customerEmail: deliveryData.email,
+          customerPhone: deliveryData.phone,
+          total,
+          paymentMethod: "Receipt Upload",
+          deliveryState: deliveryData.state,
+          deliveryCity: deliveryData.city,
+          items: orderItems,
+        },
+      }).catch(() => {});
 
       clearCart();
       toast({ title: "Order Placed!", description: "Your order has been submitted. We'll verify your payment shortly." });
@@ -226,6 +239,21 @@ const Checkout = () => {
 
       const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
       if (itemsError) throw new Error(itemsError.message);
+
+      // Send admin notification
+      supabase.functions.invoke("notify-admin-order", {
+        body: {
+          orderId: order.id,
+          customerName: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          customerEmail: deliveryData.email,
+          customerPhone: deliveryData.phone,
+          total,
+          paymentMethod: "Paystack",
+          deliveryState: deliveryData.state,
+          deliveryCity: deliveryData.city,
+          items: orderItems,
+        },
+      }).catch(() => {});
 
       return order.id;
     } catch (error) {
