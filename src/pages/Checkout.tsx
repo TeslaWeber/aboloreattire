@@ -416,7 +416,19 @@ const Checkout = () => {
                     <div className="p-3 bg-background rounded-lg border border-border space-y-1">
                       <p className="text-sm font-semibold">Transfer to this account:</p>
                       <p className="text-sm"><span className="text-muted-foreground">Bank:</span> JAIZ</p>
-                      <p className="text-sm"><span className="text-muted-foreground">Acc. No:</span> 0017708379</p>
+                      <p className="text-sm flex items-center gap-2">
+                        <span className="text-muted-foreground">Acc. No:</span> 0017708379
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText("0017708379");
+                            toast({ title: "Copied!", description: "Account number copied to clipboard." });
+                          }}
+                          className="text-xs text-primary hover:underline font-medium"
+                        >
+                          Copy
+                        </button>
+                      </p>
                       <p className="text-sm"><span className="text-muted-foreground">Acc. Name:</span> Suliyat Titilope Abdullahi</p>
                       <p className="text-sm font-semibold text-primary mt-2">Amount: {formatPrice(total)}</p>
                     </div>
