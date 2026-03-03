@@ -413,6 +413,13 @@ const Checkout = () => {
                   </p>
                 ) : (
                   <div className="space-y-3">
+                    <div className="p-3 bg-background rounded-lg border border-border space-y-1">
+                      <p className="text-sm font-semibold">Transfer to this account:</p>
+                      <p className="text-sm"><span className="text-muted-foreground">Bank:</span> JAIZ</p>
+                      <p className="text-sm"><span className="text-muted-foreground">Acc. No:</span> 0017708379</p>
+                      <p className="text-sm"><span className="text-muted-foreground">Acc. Name:</span> Suliyat Titilope Abdullahi</p>
+                      <p className="text-sm font-semibold text-primary mt-2">Amount: {formatPrice(total)}</p>
+                    </div>
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Upload className="h-4 w-4" />
                       Upload a screenshot of your payment receipt
@@ -498,10 +505,16 @@ const Checkout = () => {
               <span className="text-muted-foreground">Subtotal ({totalItems} items)</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
+            {delivery > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Delivery</span>
+                <span>{formatPrice(delivery)}</span>
+              </div>
+            )}
           </div>
           <div className="flex justify-between py-4 font-display text-xl font-bold">
             <span>Total</span>
-            <span className="text-primary">{formatPrice(subtotal)}</span>
+            <span className="text-primary">{formatPrice(total)}</span>
           </div>
           
           <div className="pt-4 border-t border-border">
