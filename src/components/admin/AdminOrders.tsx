@@ -78,21 +78,35 @@ const AdminOrders = ({ orders, onRefresh }: AdminOrdersProps) => {
     PAYMENT_STATUSES.find((s) => s.value === status)?.color || "bg-muted text-muted-foreground";
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    const order = orders.find(o => o.id === orderId);
     const { error } = await supabase.from("orders").update({ status: newStatus }).eq("id", orderId);
     if (error) {
       toast({ title: "Error", description: "Failed to update order status.", variant: "destructive" });
     } else {
       toast({ title: "Status Updated", description: `Order marked as ${newStatus}.` });
+      // Notify customer
+      if (order) {
+        supabase.functions.invoke("notify-customer-status", {
+          body: { customerEmail: order.customer_email, customerName: order.customer_name, orderId, changeType: "order", newStatus },
+        }).catch(() => {});
+      }
       onRefresh();
     }
   };
 
   const handleUpdatePaymentStatus = async (orderId: string, newStatus: string) => {
+    const order = orders.find(o => o.id === orderId);
     const { error } = await supabase.from("orders").update({ payment_status: newStatus }).eq("id", orderId);
     if (error) {
       toast({ title: "Error", description: "Failed to update payment status.", variant: "destructive" });
     } else {
       toast({ title: "Payment Status Updated", description: `Payment marked as ${newStatus}.` });
+      // Notify customer
+      if (order) {
+        supabase.functions.invoke("notify-customer-status", {
+          body: { customerEmail: order.customer_email, customerName: order.customer_name, orderId, changeType: "payment", newStatus },
+        }).catch(() => {});
+      }
       onRefresh();
     }
   };
