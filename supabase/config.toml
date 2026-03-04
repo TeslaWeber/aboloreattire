@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.notify-admin-order]
 verify_jwt = false
+
+[functions.notify-customer-status]
+verify_jwt = false

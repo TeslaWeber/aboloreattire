@@ -11,9 +11,9 @@ Deno.serve(async (req) => {
   try {
     const { orderId, customerName, customerEmail, customerPhone, total, paymentMethod, deliveryState, deliveryCity, items } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY not configured");
       return new Response(JSON.stringify({ error: "Email not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -21,12 +21,12 @@ Deno.serve(async (req) => {
     }
 
     const itemsList = (items || [])
-      .map((i: any) => `• ${i.product_name} (x${i.quantity}) - ₦${Number(i.price * i.quantity).toLocaleString()}`)
-      .join("\n");
+      .map((i: any) => `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${i.product_name}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">x${i.quantity}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">₦${Number(i.price * i.quantity).toLocaleString()}</td></tr>`)
+      .join("");
 
     const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #333; border-bottom: 2px solid #e5e5e5; padding-bottom: 10px;">🛒 New Order Received!</h2>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+        <h2 style="color: #333; border-bottom: 2px solid #d4a574; padding-bottom: 10px;">🛒 New Order Received!</h2>
         <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
           <p style="margin: 5px 0;"><strong>Order ID:</strong> ${orderId}</p>
           <p style="margin: 5px 0;"><strong>Customer:</strong> ${customerName}</p>
@@ -36,56 +36,29 @@ Deno.serve(async (req) => {
           <p style="margin: 5px 0;"><strong>Payment Method:</strong> ${paymentMethod}</p>
           <p style="margin: 5px 0; font-size: 18px; color: #16a34a;"><strong>Total: ₦${Number(total).toLocaleString()}</strong></p>
         </div>
-        ${itemsList ? `<div style="background: #fff; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;"><h3 style="margin-top: 0;">Items:</h3><pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre></div>` : ""}
-        <p style="color: #888; font-size: 12px; margin-top: 20px;">This is an automated notification from Abolore Wearables.</p>
+        ${itemsList ? `<table style="width:100%;border-collapse:collapse;margin-top:10px;"><thead><tr style="background:#f0f0f0;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Price</th></tr></thead><tbody>${itemsList}</tbody></table>` : ""}
+        <p style="color: #888; font-size: 12px; margin-top: 20px;">This is an automated notification from Abolore Couture.</p>
       </div>
     `;
 
-    // Use Lovable's transactional email capability
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const projectId = SUPABASE_URL.replace("https://", "").replace(".supabase.co", "");
-
-    const emailRes = await fetch(`https://api.lovable.dev/v1/projects/${projectId}/emails/send`, {
+    const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        to: "abolorecouture@gmail.com",
+        from: "Abolore Couture <onboarding@resend.dev>",
+        to: ["abolorecouture@gmail.com"],
         subject: `New Order from ${customerName} - ₦${Number(total).toLocaleString()}`,
         html: emailHtml,
-        purpose: "transactional",
       }),
     });
 
     if (!emailRes.ok) {
       const errText = await emailRes.text();
-      console.error("Email send failed:", errText);
-      
-      // Fallback: Try WhatsApp notification
-      const WHATSAPP_ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
-      const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
-      
-      if (WHATSAPP_ACCESS_TOKEN && WHATSAPP_PHONE_NUMBER_ID) {
-        const message = `🛒 *New Order!*\n\n*Customer:* ${customerName}\n*Phone:* ${customerPhone}\n*Amount:* ₦${Number(total).toLocaleString()}\n*Method:* ${paymentMethod}\n*Location:* ${deliveryCity}, ${deliveryState}`;
-        
-        await fetch(`https://graph.facebook.com/v21.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messaging_product: "whatsapp",
-            to: "2348069535463",
-            type: "text",
-            text: { body: message },
-          }),
-        });
-      }
-      
-      return new Response(JSON.stringify({ sent: false, fallback: "whatsapp" }), {
+      console.error("Resend email failed:", errText);
+      return new Response(JSON.stringify({ sent: false, error: errText }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

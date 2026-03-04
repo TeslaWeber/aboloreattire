@@ -36,7 +36,6 @@ Deno.serve(async (req) => {
     const body = await req.text();
     const signature = req.headers.get("x-paystack-signature");
 
-    // Verify webhook signature
     if (signature) {
       const isValid = await verifySignature(PAYSTACK_SECRET_KEY, body, signature);
       if (!isValid) {
@@ -49,7 +48,7 @@ Deno.serve(async (req) => {
     console.log("Paystack webhook event:", event.event);
 
     if (event.event === "charge.success") {
-      const { reference, metadata, customer } = event.data;
+      const { reference, metadata } = event.data;
       const orderId = metadata?.order_id || reference;
 
       const supabase = createClient(
@@ -57,7 +56,6 @@ Deno.serve(async (req) => {
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
 
-      // Update order status and payment status
       const { error: updateError } = await supabase
         .from("orders")
         .update({
@@ -73,7 +71,7 @@ Deno.serve(async (req) => {
 
       console.log(`Order ${orderId} payment confirmed`);
 
-      // Send admin email notification
+      // Send admin email via Resend
       try {
         const { data: order } = await supabase
           .from("orders")
@@ -87,18 +85,16 @@ Deno.serve(async (req) => {
             .select("*")
             .eq("order_id", orderId);
 
-          const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-          const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-          const projectId = SUPABASE_URL.replace("https://", "").replace(".supabase.co", "");
+          const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-          if (LOVABLE_API_KEY) {
+          if (RESEND_API_KEY) {
             const itemsList = (orderItems || [])
-              .map((i: any) => `• ${i.product_name} (x${i.quantity}) - ₦${Number(i.price * i.quantity).toLocaleString()}`)
-              .join("\n");
+              .map((i: any) => `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${i.product_name}</td><td style="padding:8px;text-align:center;border-bottom:1px solid #eee;">x${i.quantity}</td><td style="padding:8px;text-align:right;border-bottom:1px solid #eee;">₦${Number(i.price * i.quantity).toLocaleString()}</td></tr>`)
+              .join("");
 
             const emailHtml = `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #16a34a; border-bottom: 2px solid #e5e5e5; padding-bottom: 10px;">✅ Payment Confirmed via Paystack!</h2>
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+                <h2 style="color: #16a34a; border-bottom: 2px solid #d4a574; padding-bottom: 10px;">✅ Payment Confirmed via Paystack!</h2>
                 <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
                   <p><strong>Order ID:</strong> ${orderId}</p>
                   <p><strong>Customer:</strong> ${order.customer_name}</p>
@@ -107,72 +103,54 @@ Deno.serve(async (req) => {
                   <p><strong>Delivery:</strong> ${order.delivery_city}, ${order.delivery_state}</p>
                   <p style="font-size: 18px; color: #16a34a;"><strong>Total: ₦${Number(order.total).toLocaleString()}</strong></p>
                 </div>
-                ${itemsList ? `<div style="background: #fff; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;"><h3>Items:</h3><pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre></div>` : ""}
+                ${itemsList ? `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f0f0f0;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Price</th></tr></thead><tbody>${itemsList}</tbody></table>` : ""}
               </div>
             `;
 
-            await fetch(`https://api.lovable.dev/v1/projects/${projectId}/emails/send`, {
+            await fetch("https://api.resend.com/emails", {
               method: "POST",
               headers: {
-                "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+                "Authorization": `Bearer ${RESEND_API_KEY}`,
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                to: "abolorecouture@gmail.com",
+                from: "Abolore Couture <onboarding@resend.dev>",
+                to: ["abolorecouture@gmail.com"],
                 subject: `✅ Payment Confirmed - ${order.customer_name} - ₦${Number(order.total).toLocaleString()}`,
                 html: emailHtml,
-                purpose: "transactional",
+              }),
+            });
+
+            // Also notify customer
+            await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${RESEND_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                from: "Abolore Couture <onboarding@resend.dev>",
+                to: [order.customer_email],
+                subject: `✅ Payment Confirmed - Your order is being processed`,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+                    <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #d4a574;">
+                      <h1 style="color: #333; margin: 0;">ABOLORE COUTURE</h1>
+                    </div>
+                    <div style="padding: 30px 0;">
+                      <h2 style="color: #16a34a;">✅ Payment Confirmed!</h2>
+                      <p>Hi ${order.customer_name},</p>
+                      <p>Your payment of <strong>₦${Number(order.total).toLocaleString()}</strong> has been confirmed. Your order is now being processed.</p>
+                      <p style="color: #888; font-size: 12px; margin-top: 30px;">Thank you for shopping with Abolore Couture!</p>
+                    </div>
+                  </div>
+                `,
               }),
             });
           }
         }
       } catch (notifyError) {
-        console.error("Admin notification error:", notifyError);
-      }
-
-      // Send WhatsApp notification if configured
-      try {
-        const WHATSAPP_ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
-        const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
-
-        if (WHATSAPP_ACCESS_TOKEN && WHATSAPP_PHONE_NUMBER_ID) {
-          // Fetch order details
-          const { data: order } = await supabase
-            .from("orders")
-            .select("*")
-            .eq("id", orderId)
-            .single();
-
-          if (order) {
-            const message = `✅ *Payment Confirmed!*\n\n` +
-              `*Customer:* ${order.customer_name}\n` +
-              `*Email:* ${order.customer_email}\n` +
-              `*Phone:* ${order.customer_phone}\n` +
-              `*Amount:* ₦${Number(order.total).toLocaleString()}\n` +
-              `*Method:* Card (Paystack)\n` +
-              `*Order ID:* ${orderId}`;
-
-            await fetch(
-              `https://graph.facebook.com/v21.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
-              {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  messaging_product: "whatsapp",
-                  to: "2348069535463",
-                  type: "text",
-                  text: { body: message },
-                }),
-              }
-            );
-          }
-        }
-      } catch (whatsappError) {
-        console.error("WhatsApp notification error:", whatsappError);
-        // Don't fail the webhook for notification errors
+        console.error("Notification error:", notifyError);
       }
     }
 
