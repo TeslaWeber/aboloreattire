@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 
@@ -54,8 +54,8 @@ const PaymentSuccess = () => {
       {reference && (
         <p className="text-sm text-muted-foreground mb-6">Reference: {reference}</p>
       )}
-      <div className="flex gap-3 justify-center">
-        <Button asChild><Link to="/products">Continue Shopping</Link></Button>
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Button asChild><Link to="/products"><ShoppingBag className="mr-2 h-4 w-4" />Back to Shopping</Link></Button>
         <Button variant="outline" asChild><Link to="/account">View Orders</Link></Button>
       </div>
     </div>
