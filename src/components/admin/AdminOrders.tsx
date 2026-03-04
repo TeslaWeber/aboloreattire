@@ -84,10 +84,14 @@ const AdminOrders = ({ orders, onRefresh }: AdminOrdersProps) => {
       toast({ title: "Error", description: "Failed to update order status.", variant: "destructive" });
     } else {
       toast({ title: "Status Updated", description: `Order marked as ${newStatus}.` });
-      // Notify customer
+      // Notify customer via email
       if (order) {
         supabase.functions.invoke("notify-customer-status", {
           body: { customerEmail: order.customer_email, customerName: order.customer_name, orderId, changeType: "order", newStatus },
+        }).catch(() => {});
+        // Notify customer via WhatsApp
+        supabase.functions.invoke("notify-whatsapp", {
+          body: { orderId, customerName: order.customer_name, customerPhone: order.customer_phone, type: "status_update", changeType: "order", newStatus },
         }).catch(() => {});
       }
       onRefresh();
@@ -101,10 +105,14 @@ const AdminOrders = ({ orders, onRefresh }: AdminOrdersProps) => {
       toast({ title: "Error", description: "Failed to update payment status.", variant: "destructive" });
     } else {
       toast({ title: "Payment Status Updated", description: `Payment marked as ${newStatus}.` });
-      // Notify customer
+      // Notify customer via email
       if (order) {
         supabase.functions.invoke("notify-customer-status", {
           body: { customerEmail: order.customer_email, customerName: order.customer_name, orderId, changeType: "payment", newStatus },
+        }).catch(() => {});
+        // Notify customer via WhatsApp
+        supabase.functions.invoke("notify-whatsapp", {
+          body: { orderId, customerName: order.customer_name, customerPhone: order.customer_phone, type: "status_update", changeType: "payment", newStatus },
         }).catch(() => {});
       }
       onRefresh();

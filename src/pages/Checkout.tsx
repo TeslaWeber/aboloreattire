@@ -180,6 +180,31 @@ const Checkout = () => {
         },
       }).catch(() => {});
 
+      // Send customer order confirmation email
+      supabase.functions.invoke("notify-customer-status", {
+        body: {
+          customerEmail: deliveryData.email,
+          customerName: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          orderId: order.id,
+          changeType: "order_placed",
+          newStatus: "order_placed",
+          total,
+          items: orderItems,
+        },
+      }).catch(() => {});
+
+      // Send WhatsApp notifications
+      supabase.functions.invoke("notify-whatsapp", {
+        body: {
+          orderId: order.id,
+          customerName: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          customerPhone: deliveryData.phone,
+          total,
+          paymentMethod: "Receipt Upload",
+          type: "new_order",
+        },
+      }).catch(() => {});
+
       clearCart();
       toast({ title: "Order Placed!", description: "Your order has been submitted. We'll verify your payment shortly." });
       navigate("/payment-success?method=receipt");
@@ -252,6 +277,31 @@ const Checkout = () => {
           deliveryState: deliveryData.state,
           deliveryCity: deliveryData.city,
           items: orderItems,
+        },
+      }).catch(() => {});
+
+      // Send customer order confirmation email
+      supabase.functions.invoke("notify-customer-status", {
+        body: {
+          customerEmail: deliveryData.email,
+          customerName: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          orderId: order.id,
+          changeType: "order_placed",
+          newStatus: "order_placed",
+          total,
+          items: orderItems,
+        },
+      }).catch(() => {});
+
+      // Send WhatsApp notifications
+      supabase.functions.invoke("notify-whatsapp", {
+        body: {
+          orderId: order.id,
+          customerName: `${deliveryData.firstName} ${deliveryData.lastName}`.trim(),
+          customerPhone: deliveryData.phone,
+          total,
+          paymentMethod: "Paystack",
+          type: "new_order",
         },
       }).catch(() => {});
 
