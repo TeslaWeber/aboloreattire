@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ShoppingBag, Menu, Smartphone, Truck, Shield, RefreshCw } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, Truck, Shield, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -255,27 +255,6 @@ const Header = () => {
               </div>
             </div>
 
-            {/* Get the App */}
-            <div className="pt-4 mt-4 border-t border-border space-y-1">
-              <a
-                href="https://median.co/share/yewkqae#apk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 py-3 px-3 text-primary font-medium hover:bg-muted rounded-lg transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Smartphone className="h-5 w-5" />
-                Get the App (Android)
-              </a>
-              <a
-                href="#"
-                className="flex items-center gap-3 py-3 px-3 text-primary/50 font-medium cursor-not-allowed"
-                onClick={(e) => e.preventDefault()}
-              >
-                <Smartphone className="h-5 w-5" />
-                Get the App (iOS) — Coming Soon
-              </a>
-            </div>
           </nav>
         </SheetContent>
       </Sheet>
