@@ -146,10 +146,11 @@ const CartDrawer = () => {
                   </Button>
                   <Button
                     variant="ghost"
+                    asChild
                     className="w-full text-muted-foreground"
                     onClick={() => setIsCartOpen(false)}
                   >
-                    Continue Shopping
+                    <Link to="/products">Continue Shopping</Link>
                   </Button>
                 </div>
               </div>
