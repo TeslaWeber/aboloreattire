@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star, Loader2 } from "lucide-react";
+import { Star, Heart } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { categories, formatPrice } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useWishlist } from "@/context/WishlistContext";
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -13,6 +14,7 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("featured");
   
   const { products, loading, error } = useProducts(categoryFilter);
+  const { toggleItem, isInWishlist } = useWishlist();
 
   const sortedProducts = useMemo(() => {
     let sorted = [...products];
@@ -103,8 +105,17 @@ const Products = () => {
                     <Link to={`/product/${product.id}`} className="block">
                       <div className="relative overflow-hidden rounded-xl bg-muted aspect-[3/4]">
                         <img src={product.images[0] || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        {product.discount && <span className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded">-{product.discount}%</span>}
-                        {product.isNew && <span className="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">NEW</span>}
+                         {product.discount && <span className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded">-{product.discount}%</span>}
+                         {product.isNew && <span className="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">NEW</span>}
+                         <button
+                           onClick={(e) => {
+                             e.preventDefault();
+                             toggleItem({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.images[0] || "/placeholder.svg", discount: product.discount });
+                           }}
+                           className="absolute bottom-3 right-3 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
+                         >
+                           <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? "fill-primary text-primary" : ""}`} />
+                         </button>
                       </div>
                       <div className="mt-4">
                         <h3 className="font-medium text-sm truncate">{product.name}</h3>

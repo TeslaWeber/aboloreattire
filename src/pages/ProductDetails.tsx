@@ -6,6 +6,7 @@ import { formatPrice } from "@/data/products";
 import { useProduct } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { useToast } from "@/hooks/use-toast";
 import ImageGallery from "@/components/product/ImageGallery";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
@@ -18,6 +19,7 @@ const ProductDetails = () => {
   const { addItem } = useCart();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { toggleItem, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -132,7 +134,26 @@ const ProductDetails = () => {
 
             <div className="flex gap-3 mb-8">
               <Button onClick={handleAddToCart} size="lg" className="flex-1 luxury-gradient text-primary-foreground font-semibold">Add to Cart</Button>
-              <Button variant="outline" size="lg"><Heart className="h-5 w-5" /></Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => {
+                  toggleItem({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    originalPrice: product.originalPrice,
+                    image: product.images[0] || "/placeholder.svg",
+                    discount: product.discount,
+                  });
+                  toast({
+                    title: isInWishlist(product.id) ? "Removed from wishlist" : "Added to wishlist",
+                    description: product.name,
+                  });
+                }}
+              >
+                <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-primary text-primary" : ""}`} />
+              </Button>
             </div>
 
             <div className="space-y-3 pt-6 border-t border-border">

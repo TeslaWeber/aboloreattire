@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categories, formatPrice } from "@/data/products";
 import { useFeaturedProducts } from "@/hooks/useProducts";
 import { useAuth } from "@/context/AuthContext";
 import HeroCarousel from "@/components/home/HeroCarousel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useWishlist } from "@/context/WishlistContext";
 
 const Index = () => {
   const { products: featuredProducts, loading } = useFeaturedProducts();
+  const { toggleItem, isInWishlist } = useWishlist();
   const { user } = useAuth();
   const [visibleCount, setVisibleCount] = useState(10);
   
@@ -143,6 +145,15 @@ const Index = () => {
                           NEW
                         </span>
                       )}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleItem({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.images[0] || "/placeholder.svg", discount: product.discount });
+                        }}
+                        className="absolute bottom-3 right-3 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
+                      >
+                        <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? "fill-primary text-primary" : ""}`} />
+                      </button>
                     </div>
                     <div className="mt-4">
                       <h3 className="font-medium text-sm lg:text-base truncate">{product.name}</h3>
