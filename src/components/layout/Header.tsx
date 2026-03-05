@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ShoppingBag, Menu, Truck, Shield, RefreshCw } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, Truck, Shield, RefreshCw, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import SearchDialog from "@/components/search/SearchDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +34,7 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
+  const { totalItems: wishlistTotal } = useWishlist();
   const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [hasNotification, setHasNotification] = useState(false);
@@ -150,6 +152,15 @@ const Header = () => {
               <button onClick={() => setIsSearchOpen(true)} className="p-2 hover:bg-muted rounded-full transition-colors">
                 <Search className="h-5 w-5" />
               </button>
+
+              <Link to="/wishlist" className="relative p-2 hover:bg-muted rounded-full transition-colors">
+                <Heart className="h-5 w-5" />
+                {wishlistTotal > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishlistTotal}
+                  </span>
+                )}
+              </Link>
 
               {user ? (
                 <Link
