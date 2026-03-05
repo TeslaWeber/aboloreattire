@@ -144,6 +144,13 @@ const CartDrawer = () => {
                   >
                     <Link to="/cart">View Cart</Link>
                   </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-muted-foreground"
+                    onClick={() => setIsCartOpen(false)}
+                  >
+                    Continue Shopping
+                  </Button>
                 </div>
               </div>
             )}
