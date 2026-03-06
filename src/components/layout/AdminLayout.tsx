@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import logo from "@/assets/logo.png";
 import {
   LayoutDashboard,
   Package,
