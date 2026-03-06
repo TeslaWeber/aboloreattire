@@ -153,6 +153,7 @@ const Account = () => {
         >
           {/* Header */}
           <div className="mb-6 sm:mb-8">
+            <BackButton />
             <h1 className="font-display text-2xl sm:text-3xl font-bold mb-2">My Account</h1>
             <p className="text-muted-foreground text-sm sm:text-base">
               Welcome back, {user.email}
