@@ -198,17 +198,12 @@ const Index = () => {
                           -{product.discount}%
                         </span>
                       )}
-                      {product.isNew && (
-                        <span className="absolute top-3 right-12 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-lg">
-                          NEW
-                        </span>
-                      )}
                       <button
                         onClick={(e) => {
                           e.preventDefault();
                           toggleItem({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.images[0] || "/placeholder.svg", discount: product.discount });
                         }}
-                        className="absolute top-3 right-3 p-2 bg-background/70 backdrop-blur-md rounded-full hover:bg-background transition-all duration-200 hover:scale-110"
+                        className="absolute bottom-3 right-3 p-2 bg-background/70 backdrop-blur-md rounded-full hover:bg-background transition-all duration-200 hover:scale-110"
                       >
                         <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? "fill-primary text-primary" : "text-foreground/70"}`} />
                       </button>
