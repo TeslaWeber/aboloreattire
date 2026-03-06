@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import ImageGallery from "@/components/product/ImageGallery";
 import AuthRequiredDialog from "@/components/auth/AuthRequiredDialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import BackButton from "@/components/BackButton";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -79,6 +80,7 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
+        <BackButton />
         <div className="text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Home</Link> / <Link to="/products" className="hover:text-primary">Products</Link> / <span className="text-foreground">{product.name}</span>
         </div>

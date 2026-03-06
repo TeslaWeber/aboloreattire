@@ -7,6 +7,7 @@ import { categories, formatPrice } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWishlist } from "@/context/WishlistContext";
+import BackButton from "@/components/BackButton";
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -32,6 +33,7 @@ const Products = () => {
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
+        <BackButton />
         {/* Breadcrumb */}
         <div className="text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">{activeCategory?.name || "All Products"}</span>

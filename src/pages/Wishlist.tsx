@@ -4,6 +4,7 @@ import { Heart, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/context/WishlistContext";
 import { formatPrice } from "@/data/products";
+import BackButton from "@/components/BackButton";
 
 const Wishlist = () => {
   const { items, removeItem } = useWishlist();
@@ -11,6 +12,7 @@ const Wishlist = () => {
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
+        <BackButton />
         <div className="text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">Wishlist</span>
         </div>

@@ -1,20 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import BackButton from "@/components/BackButton";
 
 const TermsOfService = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => navigate(-1)}
-        className="absolute top-4 right-4 bg-muted/80 rounded-full"
-      >
-        <X className="h-5 w-5" />
-      </Button>
+    <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <BackButton />
       <h1 className="font-display text-3xl lg:text-4xl font-bold mb-2">Terms of Service</h1>
       <p className="text-muted-foreground mb-8">Last updated: February 11, 2026</p>
 
