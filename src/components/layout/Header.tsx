@@ -128,7 +128,7 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <h1 className="font-display text-2xl lg:text-3xl font-bold luxury-text-gradient">
-                ABOLORE COUTURE
+                A.B.Couture
               </h1>
             </Link>
 
