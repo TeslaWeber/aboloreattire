@@ -41,7 +41,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <h4 className="font-display text-xl font-bold luxury-text-gradient mb-4">
-              ABOLORE COUTURE
+              A.B.Couture
             </h4>
             <p className="text-muted-foreground text-sm mb-4">
               Discover luxury fashion, accessories, and beauty products curated for the modern connoisseur.
