@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Star, Heart, Sparkles, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categories, formatPrice } from "@/data/products";
@@ -17,6 +17,23 @@ const Index = () => {
   const [visibleCount, setVisibleCount] = useState(10);
   
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Valued Customer';
+
+  const exploreOptions = [
+    { label: "Explore Men's", link: "/products?category=men" },
+    { label: "Explore Women's", link: "/products?category=women" },
+    { label: "Explore Kids'", link: "/products?category=kids" },
+    { label: "Explore Shoes", link: "/products?category=shoes" },
+    { label: "Explore Bags", link: "/products?category=bags" },
+    { label: "Explore Jewelry", link: "/products?category=jewelry" },
+  ];
+  const [exploreIndex, setExploreIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setExploreIndex((prev) => (prev + 1) % exploreOptions.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [exploreOptions.length]);
 
   return (
     <div>
@@ -52,15 +69,6 @@ const Index = () => {
             transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="max-w-xl"
           >
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 mb-6"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-medium text-primary tracking-wider uppercase">New Collection</span>
-            </motion.div>
             <h1 className="font-display text-4xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-[1.1]">
               Elevate Your <span className="luxury-text-gradient">Street Style</span>
             </h1>
@@ -71,8 +79,20 @@ const Index = () => {
               <Button asChild size="lg" className="luxury-gradient text-primary-foreground font-semibold px-8">
                 <Link to="/products">Shop Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10">
-                <Link to="/products?category=men">Explore Men's</Link>
+              <Button asChild variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 min-w-[160px]">
+                <Link to={exploreOptions[exploreIndex].link}>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={exploreIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {exploreOptions[exploreIndex].label}
+                    </motion.span>
+                  </AnimatePresence>
+                </Link>
               </Button>
             </div>
           </motion.div>
@@ -220,13 +240,6 @@ const Index = () => {
                 className="font-semibold border-primary/30 hover:bg-primary/10 px-10"
               >
                 Load More
-              </Button>
-            </div>
-          )}
-          {!loading && featuredProducts.length > 0 && (
-            <div className="flex justify-center mt-4 md:hidden">
-              <Button asChild variant="ghost" className="text-primary">
-                <Link to="/products">View All Products <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </Button>
             </div>
           )}

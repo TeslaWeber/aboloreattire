@@ -134,7 +134,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-success hover:text-success/80 transition-colors"
               >
-                <MessageCircle className="h-5 w-5" />
+                <MessageCircle className="h-3.5 w-3.5" />
               </a>
             </div>
           </div>
