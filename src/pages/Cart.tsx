@@ -3,6 +3,7 @@ import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/data/products";
+import BackButton from "@/components/BackButton";
 
 const Cart = () => {
   const { items, removeItem, updateQuantity, subtotal } = useCart();
@@ -21,6 +22,7 @@ const Cart = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <BackButton />
       <h1 className="font-display text-3xl font-bold mb-8">Shopping Cart</h1>
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
