@@ -204,7 +204,7 @@ const Header = () => {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="p-6 border-b border-border">
-            <SheetTitle className="font-display text-lg luxury-text-gradient text-left">ABOLORE COUTURE</SheetTitle>
+            <SheetTitle className="font-display text-lg luxury-text-gradient text-left">A.B.Couture</SheetTitle>
           </SheetHeader>
           <nav className="p-4 space-y-1">
             {user ? (
