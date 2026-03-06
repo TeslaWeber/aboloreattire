@@ -17,7 +17,7 @@ const Footer = () => {
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-2xl mx-auto text-center">
               <h3 className="font-display text-2xl lg:text-3xl font-bold mb-3">
-                Welcome to <span className="luxury-text-gradient">ABOLORE COUTURE</span>
+                Welcome to <span className="luxury-text-gradient">A.B.Couture</span>
               </h3>
               <p className="text-muted-foreground mb-6">
                 Sign in to access exclusive offers, track your orders, and enjoy a personalized shopping experience.
