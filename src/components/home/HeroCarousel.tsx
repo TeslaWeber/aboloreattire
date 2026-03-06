@@ -9,11 +9,19 @@ import heroStreet6 from "@/assets/hero-street-6.jpg";
 import heroStreet7 from "@/assets/hero-street-7.jpg";
 import heroStreet8 from "@/assets/hero-street-8.jpg";
 import heroStreet9 from "@/assets/hero-street-9.jpg";
+import heroStreet10 from "@/assets/hero-street-10.jpg";
+import heroStreet11 from "@/assets/hero-street-11.jpg";
+import heroStreet12 from "@/assets/hero-street-12.jpg";
+import heroStreet13 from "@/assets/hero-street-13.jpg";
+import heroStreet14 from "@/assets/hero-street-14.jpg";
+import heroStreet15 from "@/assets/hero-street-15.jpg";
 
 const heroImages = [
   heroStreet1, heroStreet2, heroStreet3,
   heroStreet4, heroStreet5, heroStreet6,
   heroStreet7, heroStreet8, heroStreet9,
+  heroStreet10, heroStreet11, heroStreet12,
+  heroStreet13, heroStreet14, heroStreet15,
 ];
 
 const HeroCarousel = () => {
@@ -59,7 +67,7 @@ const HeroCarousel = () => {
             onClick={() => goToSlide(i)}
             className={`h-1.5 rounded-full transition-all duration-500 ${
               i === currentIndex
-                ? "bg-primary w-8"
+                ? "bg-primary w-6"
                 : "bg-foreground/30 w-1.5 hover:bg-foreground/50"
             }`}
           />
