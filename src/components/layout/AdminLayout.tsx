@@ -95,7 +95,7 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
       >
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
-            <img src={logo} alt="A.B.Couture" className="h-8 w-auto" />
+            <img src={logo} alt="A.B.Couture" className="h-10 w-auto" />
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden"><X className="h-5 w-5" /></button>
           </div>
           <p className="text-xs text-muted-foreground mt-1">Admin Dashboard</p>

@@ -128,7 +128,7 @@ const Header = () => {
 
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logo} alt="A.B.Couture" className="h-10 lg:h-12 w-auto" />
+              <img src={logo} alt="A.B.Couture" className="h-14 lg:h-16 w-auto" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -203,7 +203,7 @@ const Header = () => {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="p-6 border-b border-border">
-            <SheetTitle className="text-left"><img src={logo} alt="A.B.Couture" className="h-8 w-auto" /></SheetTitle>
+            <SheetTitle className="text-left"><img src={logo} alt="A.B.Couture" className="h-10 w-auto" /></SheetTitle>
           </SheetHeader>
           <nav className="p-4 space-y-1">
             {user ? (
