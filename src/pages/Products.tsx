@@ -106,7 +106,6 @@ const Products = () => {
                       <div className="relative overflow-hidden rounded-xl bg-muted aspect-[3/4]">
                         <img src={product.images[0] || "/placeholder.svg"} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                          {product.discount && <span className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded">-{product.discount}%</span>}
-                         {product.isNew && <span className="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">NEW</span>}
                          <button
                            onClick={(e) => {
                              e.preventDefault();

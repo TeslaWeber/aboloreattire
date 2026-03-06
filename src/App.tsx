@@ -15,6 +15,7 @@ import PullToRefresh from "@/components/PullToRefresh";
 import BottomTabNav from "@/components/layout/BottomTabNav";
 import { useMedianApp } from "@/hooks/useMedianApp";
 import { useMedianNativeFeatures } from "@/hooks/useMedianNativeFeatures";
+import { useThemeLoader } from "@/hooks/useThemeLoader";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
@@ -79,6 +80,7 @@ const MainLayout = () => {
 
 const NativeFeatureInit = () => {
   useMedianNativeFeatures();
+  useThemeLoader();
   return null;
 };
 
