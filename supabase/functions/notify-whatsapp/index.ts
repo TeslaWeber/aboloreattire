@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
 
       // Notify customer
       if (customerPhone) {
-        const customerMsg = `🛍️ *Order Confirmed - A.B.Couture*\n\n` +
+        const customerMsg = `🛍️ *Order Confirmed - ABOLORE COUTURE*\n\n` +
           `Hi ${customerName}!\n\n` +
           `Thank you for your order. We've received it and will begin processing shortly.\n\n` +
           `*Order ID:* ${orderId.slice(0, 8)}...\n` +
@@ -93,11 +93,11 @@ Deno.serve(async (req) => {
       const typeLabel = changeType === "payment" ? "Payment Status" : "Order Status";
 
       if (customerPhone) {
-        const msg = `${emoji} *${typeLabel} Update - A.B.Couture*\n\n` +
+        const msg = `${emoji} *${typeLabel} Update - ABOLORE COUTURE*\n\n` +
           `Hi ${customerName},\n\n` +
           `Your ${changeType === "payment" ? "payment status" : "order status"} has been updated to: *${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}*\n\n` +
           `*Order ID:* ${orderId.slice(0, 8)}...\n\n` +
-          `Thank you for shopping with A.B.Couture! 💫`;
+          `Thank you for shopping with ABOLORE COUTURE! 💫`;
 
         await sendWhatsApp(formatPhone(customerPhone), msg);
       }

@@ -104,10 +104,10 @@ const Header = () => {
       {/* News Flash Ticker */}
       <div className="bg-primary text-primary-foreground overflow-hidden">
         <div className="animate-marquee whitespace-nowrap py-1.5 text-xs font-medium inline-flex">
-          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
         </div>
       </div>
 
