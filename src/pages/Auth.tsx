@@ -161,7 +161,7 @@ const Auth = () => {
           });
         } else {
           toast({
-            title: "Welcome to A.B.Couture!",
+            title: "Welcome to ABOLORE COUTURE!",
             description: "You have successfully signed in. Enjoy your shopping experience.",
           });
           if (isAdminRoute) {
@@ -213,7 +213,7 @@ const Auth = () => {
         <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <h1 className="font-display text-3xl font-bold luxury-text-gradient mb-2">
-              {isAdminRoute ? "Admin Login" : "A.B.Couture"}
+              {isAdminRoute ? "Admin Login" : "ABOLORE COUTURE"}
             </h1>
             <p className="text-muted-foreground">
               {isAdminRoute 

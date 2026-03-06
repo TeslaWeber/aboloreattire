@@ -18,7 +18,7 @@ const Footer = () => {
           <div className="container mx-auto px-4 py-12">
             <div className="max-w-2xl mx-auto text-center">
               <h3 className="font-display text-2xl lg:text-3xl font-bold mb-3">
-                Welcome to <span className="luxury-text-gradient">A.B.Couture</span>
+                Welcome to <span className="luxury-text-gradient">ABOLORE COUTURE</span>
               </h3>
               <p className="text-muted-foreground mb-6">
                 Sign in to access exclusive offers, track your orders, and enjoy a personalized shopping experience.
@@ -41,7 +41,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
           <div>
-            <img src={logo} alt="A.B.Couture" className="h-12 w-auto mb-4" />
+            <img src={logo} alt="ABOLORE COUTURE" className="h-12 w-auto mb-4" />
+            <h4 className="font-display text-lg font-bold mb-2">ABOLORE COUTURE</h4>
             <p className="text-muted-foreground text-sm mb-4">
               Discover luxury fashion, accessories, and beauty products curated for the modern connoisseur.
             </p>
