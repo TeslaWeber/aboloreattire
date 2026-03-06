@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       const confirmationHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
           <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #d4a574;">
-            <h1 style="color: #333; margin: 0; font-size: 24px;">ABOLORE COUTURE</h1>
+            <h1 style="color: #333; margin: 0; font-size: 24px;">A.B.Couture</h1>
           </div>
           <div style="padding: 30px 0;">
             <h2 style="color: #16a34a;">🛍️ Order Confirmed!</h2>
@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
             </div>
             ${itemsList ? `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f0f0f0;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Price</th></tr></thead><tbody>${itemsList}</tbody></table>` : ""}
             <p style="color: #555; margin-top: 20px;">We'll notify you when your order status changes.</p>
-            <p style="color: #888; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">Thank you for shopping with Abolore Couture!</p>
+            <p style="color: #888; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">Thank you for shopping with A.B.Couture!</p>
           </div>
         </div>
       `;
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Abolore Couture <onboarding@resend.dev>",
+          from: "A.B.Couture <onboarding@resend.dev>",
           to: [customerEmail],
           subject: `🛍️ Order Confirmed - Thank you, ${customerName}!`,
           html: confirmationHtml,
@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
         <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #d4a574;">
-          <h1 style="color: #333; margin: 0; font-size: 24px;">ABOLORE COUTURE</h1>
+          <h1 style="color: #333; margin: 0; font-size: 24px;">A.B.Couture</h1>
         </div>
         <div style="padding: 30px 0;">
           <h2 style="color: #333;">${emoji} ${typeLabel} Update</h2>
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
           ${newStatus === "delivered" ? '<p style="color: #555;">Your order has been delivered. Thank you for shopping with us!</p>' : ""}
           ${newStatus === "confirmed" ? '<p style="color: #555;">Your payment has been confirmed. We are now processing your order.</p>' : ""}
           ${newStatus === "cancelled" ? '<p style="color: #555;">If you have questions about this, please contact us.</p>' : ""}
-          <p style="color: #888; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">This is an automated email from Abolore Couture. Please do not reply.</p>
+          <p style="color: #888; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">This is an automated email from A.B.Couture. Please do not reply.</p>
         </div>
       </div>
     `;
@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Abolore Couture <onboarding@resend.dev>",
+        from: "A.B.Couture <onboarding@resend.dev>",
         to: [customerEmail],
         subject: `${emoji} ${typeLabel} Update - ${label}`,
         html: emailHtml,

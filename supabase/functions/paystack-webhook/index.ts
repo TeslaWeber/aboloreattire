@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                from: "Abolore Couture <onboarding@resend.dev>",
+                from: "A.B.Couture <onboarding@resend.dev>",
                 to: ["abolorecouture@gmail.com"],
                 subject: `✅ Payment Confirmed - ${order.customer_name} - ₦${Number(order.total).toLocaleString()}`,
                 html: emailHtml,
@@ -129,19 +129,19 @@ Deno.serve(async (req) => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                from: "Abolore Couture <onboarding@resend.dev>",
+                from: "A.B.Couture <onboarding@resend.dev>",
                 to: [order.customer_email],
                 subject: `✅ Payment Confirmed - Your order is being processed`,
                 html: `
                   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
                     <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #d4a574;">
-                      <h1 style="color: #333; margin: 0;">ABOLORE COUTURE</h1>
+                      <h1 style="color: #333; margin: 0;">A.B.Couture</h1>
                     </div>
                     <div style="padding: 30px 0;">
                       <h2 style="color: #16a34a;">✅ Payment Confirmed!</h2>
                       <p>Hi ${order.customer_name},</p>
                       <p>Your payment of <strong>₦${Number(order.total).toLocaleString()}</strong> has been confirmed. Your order is now being processed.</p>
-                      <p style="color: #888; font-size: 12px; margin-top: 30px;">Thank you for shopping with Abolore Couture!</p>
+                      <p style="color: #888; font-size: 12px; margin-top: 30px;">Thank you for shopping with A.B.Couture!</p>
                     </div>
                   </div>
                 `,
