@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
           <p style="margin: 5px 0; font-size: 18px; color: #16a34a;"><strong>Total: ₦${Number(total).toLocaleString()}</strong></p>
         </div>
         ${itemsList ? `<table style="width:100%;border-collapse:collapse;margin-top:10px;"><thead><tr style="background:#f0f0f0;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Price</th></tr></thead><tbody>${itemsList}</tbody></table>` : ""}
-        <p style="color: #888; font-size: 12px; margin-top: 20px;">This is an automated notification from Abolore Couture.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 20px;">This is an automated notification from A.B.Couture.</p>
       </div>
     `;
 
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Abolore Couture <onboarding@resend.dev>",
+        from: "A.B.Couture <onboarding@resend.dev>",
         to: ["abolorecouture@gmail.com"],
         subject: `New Order from ${customerName} - ₦${Number(total).toLocaleString()}`,
         html: emailHtml,

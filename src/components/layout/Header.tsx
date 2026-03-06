@@ -103,10 +103,10 @@ const Header = () => {
       {/* News Flash Ticker */}
       <div className="bg-primary text-primary-foreground overflow-hidden">
         <div className="animate-marquee whitespace-nowrap py-1.5 text-xs font-medium inline-flex">
-          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to Abolore Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
+          <span className="mx-8">Welcome to A.B.Couture. Thank you for choosing us. Enjoy your shopping.</span>
         </div>
       </div>
 
@@ -128,7 +128,7 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <h1 className="font-display text-2xl lg:text-3xl font-bold luxury-text-gradient">
-                ABOLORE COUTURE
+                A.B.Couture
               </h1>
             </Link>
 
@@ -204,7 +204,7 @@ const Header = () => {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="p-6 border-b border-border">
-            <SheetTitle className="font-display text-lg luxury-text-gradient text-left">ABOLORE COUTURE</SheetTitle>
+            <SheetTitle className="font-display text-lg luxury-text-gradient text-left">A.B.Couture</SheetTitle>
           </SheetHeader>
           <nav className="p-4 space-y-1">
             {user ? (

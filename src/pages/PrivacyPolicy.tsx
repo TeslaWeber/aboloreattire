@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
         <section>
           <h2 className="font-display text-xl font-semibold mb-3">1. Introduction</h2>
           <p className="text-muted-foreground leading-relaxed">
-            At Abolore Couture, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, store, and protect your data when you interact with our website and services. By using our platform, you consent to the practices described in this policy.
+            At A.B.Couture, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, store, and protect your data when you interact with our website and services. By using our platform, you consent to the practices described in this policy.
           </p>
         </section>
 
