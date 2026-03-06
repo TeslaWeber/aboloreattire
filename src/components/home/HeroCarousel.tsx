@@ -1,47 +1,66 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import heroWoman1 from "@/assets/hero-woman-1.jpg";
-import heroMan1 from "@/assets/hero-man-1.jpg";
-import heroCouple from "@/assets/hero-couple.jpg";
+import heroStreet1 from "@/assets/hero-street-1.jpg";
+import heroStreet2 from "@/assets/hero-street-2.jpg";
+import heroStreet3 from "@/assets/hero-street-3.jpg";
+import heroStreet4 from "@/assets/hero-street-4.jpg";
+import heroStreet5 from "@/assets/hero-street-5.jpg";
+import heroStreet6 from "@/assets/hero-street-6.jpg";
+import heroStreet7 from "@/assets/hero-street-7.jpg";
+import heroStreet8 from "@/assets/hero-street-8.jpg";
+import heroStreet9 from "@/assets/hero-street-9.jpg";
 
-const heroImages = [heroWoman1, heroMan1, heroCouple];
+const heroImages = [
+  heroStreet1, heroStreet2, heroStreet3,
+  heroStreet4, heroStreet5, heroStreet6,
+  heroStreet7, heroStreet8, heroStreet9,
+];
 
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+
+  const goToNext = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+  }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
-
+    const interval = setInterval(goToNext, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [goToNext]);
+
+  const goToSlide = (i: number) => {
+    setDirection(i > currentIndex ? 1 : -1);
+    setCurrentIndex(i);
+  };
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.img
           key={currentIndex}
           src={heroImages[currentIndex]}
-          alt="Luxury Fashion"
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          alt="Streetwear Fashion"
+          custom={direction}
+          initial={{ opacity: 0, scale: 1.08, x: direction * 40 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          exit={{ opacity: 0, scale: 1.03, x: direction * -40 }}
+          transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="absolute inset-0 w-full h-full object-cover"
         />
       </AnimatePresence>
-      
+
       {/* Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-1.5">
         {heroImages.map((_, i) => (
           <button
             key={i}
-            onClick={() => setCurrentIndex(i)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+            onClick={() => goToSlide(i)}
+            className={`h-1.5 rounded-full transition-all duration-500 ${
               i === currentIndex
-                ? "bg-primary w-6"
-                : "bg-white/50 hover:bg-white/80"
+                ? "bg-primary w-8"
+                : "bg-foreground/30 w-1.5 hover:bg-foreground/50"
             }`}
           />
         ))}
