@@ -37,28 +37,9 @@ const Products = () => {
           <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-foreground">{activeCategory?.name || "All Products"}</span>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <aside className="lg:w-64 shrink-0">
-            <h3 className="font-display text-lg font-semibold mb-4">Categories</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/products" className={`block py-2 px-3 rounded-lg transition-colors ${!categoryFilter ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}>
-                  All Products
-                </Link>
-              </li>
-              {categories.map((cat) => (
-                <li key={cat.id}>
-                  <Link to={`/products?category=${cat.id}`} className={`block py-2 px-3 rounded-lg transition-colors ${categoryFilter === cat.id ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}>
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </aside>
-
+        <div>
           {/* Products Grid */}
-          <div className="flex-1">
+          <div>
             <div className="flex justify-between items-center mb-6">
               <p className="text-muted-foreground">
                 {loading ? "Loading..." : `${sortedProducts.length} products`}
