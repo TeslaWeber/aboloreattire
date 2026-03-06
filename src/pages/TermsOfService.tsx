@@ -8,14 +8,14 @@ const TermsOfService = () => {
         <section>
           <h2 className="font-display text-xl font-semibold mb-3">1. Acceptance of Terms</h2>
           <p className="text-muted-foreground leading-relaxed">
-            By accessing or using the A.B.Couture website and services, you agree to be bound by these Terms of Service. If you do not agree to all the terms and conditions, you may not access or use our services. These terms apply to all visitors, users, and customers of our platform.
+            By accessing or using the ABOLORE COUTURE website and services, you agree to be bound by these Terms of Service. If you do not agree to all the terms and conditions, you may not access or use our services. These terms apply to all visitors, users, and customers of our platform.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-semibold mb-3">2. Products & Pricing</h2>
           <p className="text-muted-foreground leading-relaxed">
-            All products listed on A.B.Couture are subject to availability. We reserve the right to modify pricing, discontinue products, or limit quantities at any time without prior notice. Prices are displayed in Nigerian Naira (₦) and are inclusive of applicable taxes unless otherwise stated. While we make every effort to display accurate product descriptions and images, slight variations may occur due to photography and screen display differences.
+            All products listed on ABOLORE COUTURE are subject to availability. We reserve the right to modify pricing, discontinue products, or limit quantities at any time without prior notice. Prices are displayed in Nigerian Naira (₦) and are inclusive of applicable taxes unless otherwise stated. While we make every effort to display accurate product descriptions and images, slight variations may occur due to photography and screen display differences.
           </p>
         </section>
 
@@ -29,7 +29,7 @@ const TermsOfService = () => {
         <section>
           <h2 className="font-display text-xl font-semibold mb-3">4. Shipping & Delivery</h2>
           <p className="text-muted-foreground leading-relaxed">
-            A.B.Couture delivers across Nigeria. Delivery fees vary based on your location and are calculated at checkout. Estimated delivery times are provided as guidelines and may vary due to factors beyond our control, including weather, logistics, and public holidays. We are not liable for delays caused by third-party delivery services. You will receive tracking information once your order has been dispatched.
+            ABOLORE COUTURE delivers across Nigeria. Delivery fees vary based on your location and are calculated at checkout. Estimated delivery times are provided as guidelines and may vary due to factors beyond our control, including weather, logistics, and public holidays. We are not liable for delays caused by third-party delivery services. You will receive tracking information once your order has been dispatched.
           </p>
         </section>
 
@@ -50,14 +50,14 @@ const TermsOfService = () => {
         <section>
           <h2 className="font-display text-xl font-semibold mb-3">7. Intellectual Property</h2>
           <p className="text-muted-foreground leading-relaxed">
-            All content on this website, including but not limited to text, images, logos, designs, and graphics, is the property of A.B.Couture and is protected by Nigerian and international copyright and trademark laws. You may not reproduce, distribute, modify, or create derivative works from any content without our prior written consent.
+            All content on this website, including but not limited to text, images, logos, designs, and graphics, is the property of ABOLORE COUTURE and is protected by Nigerian and international copyright and trademark laws. You may not reproduce, distribute, modify, or create derivative works from any content without our prior written consent.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-semibold mb-3">8. Limitation of Liability</h2>
           <p className="text-muted-foreground leading-relaxed">
-            A.B.Couture shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our website or products. Our total liability for any claim related to our services shall not exceed the amount you paid for the specific product or service in question. We are not responsible for any loss of data, revenue, or profits resulting from the use of our platform.
+            ABOLORE COUTURE shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our website or products. Our total liability for any claim related to our services shall not exceed the amount you paid for the specific product or service in question. We are not responsible for any loss of data, revenue, or profits resulting from the use of our platform.
           </p>
         </section>
 
