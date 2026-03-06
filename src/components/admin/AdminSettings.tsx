@@ -86,6 +86,84 @@ const themeOptions = [
       roseGold: "15 60% 55%",
     },
   },
+  {
+    id: "teal",
+    name: "Teal",
+    preview: "bg-[hsl(185,60%,45%)]",
+    colors: {
+      primary: "185 60% 45%",
+      accent: "185 60% 45%",
+      ring: "185 60% 45%",
+      goldLight: "185 70% 60%",
+      goldDark: "185 50% 30%",
+      roseGold: "175 50% 50%",
+    },
+  },
+  {
+    id: "crimson",
+    name: "Crimson",
+    preview: "bg-[hsl(0,70%,50%)]",
+    colors: {
+      primary: "0 70% 50%",
+      accent: "0 70% 50%",
+      ring: "0 70% 50%",
+      goldLight: "0 80% 65%",
+      goldDark: "0 60% 35%",
+      roseGold: "10 55% 55%",
+    },
+  },
+  {
+    id: "indigo",
+    name: "Indigo",
+    preview: "bg-[hsl(240,55%,55%)]",
+    colors: {
+      primary: "240 55% 55%",
+      accent: "240 55% 55%",
+      ring: "240 55% 55%",
+      goldLight: "240 65% 70%",
+      goldDark: "240 45% 40%",
+      roseGold: "250 50% 55%",
+    },
+  },
+  {
+    id: "coral",
+    name: "Coral",
+    preview: "bg-[hsl(16,80%,60%)]",
+    colors: {
+      primary: "16 80% 60%",
+      accent: "16 80% 60%",
+      ring: "16 80% 60%",
+      goldLight: "16 85% 72%",
+      goldDark: "16 65% 45%",
+      roseGold: "8 60% 58%",
+    },
+  },
+  {
+    id: "slate",
+    name: "Slate",
+    preview: "bg-[hsl(210,15%,45%)]",
+    colors: {
+      primary: "210 15% 45%",
+      accent: "210 15% 45%",
+      ring: "210 15% 45%",
+      goldLight: "210 20% 60%",
+      goldDark: "210 12% 30%",
+      roseGold: "200 15% 50%",
+    },
+  },
+  {
+    id: "magenta",
+    name: "Magenta",
+    preview: "bg-[hsl(300,60%,50%)]",
+    colors: {
+      primary: "300 60% 50%",
+      accent: "300 60% 50%",
+      ring: "300 60% 50%",
+      goldLight: "300 70% 65%",
+      goldDark: "300 50% 35%",
+      roseGold: "310 55% 55%",
+    },
+  },
 ];
 
 const applyTheme = (themeId: string) => {
@@ -243,7 +321,7 @@ const AdminSettings = () => {
           <p className="text-xs text-muted-foreground mb-4">
             Change the accent color across the entire website
           </p>
-          <RadioGroup value={selectedTheme} onValueChange={handleThemeChange} className="grid grid-cols-2 gap-3">
+          <RadioGroup value={selectedTheme} onValueChange={handleThemeChange} className="grid grid-cols-3 gap-3">
             {themeOptions.map((theme) => (
               <label
                 key={theme.id}
