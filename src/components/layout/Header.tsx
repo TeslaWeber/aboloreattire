@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Search, User, ShoppingBag, Menu, Truck, Shield, RefreshCw, Heart } from "lucide-react";
-import logo from "@/assets/logo.png";
+
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -128,7 +128,7 @@ const Header = () => {
 
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src={logo} alt="A.B.Couture" className="h-14 lg:h-16 w-auto" />
+              <h1 className="font-display text-xl lg:text-2xl font-bold tracking-wider luxury-text-gradient">ABOLORE COUTURE</h1>
             </Link>
 
             {/* Desktop Navigation */}
@@ -203,7 +203,7 @@ const Header = () => {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="p-6 border-b border-border">
-            <SheetTitle className="text-left"><img src={logo} alt="A.B.Couture" className="h-10 w-auto" /></SheetTitle>
+            <SheetTitle className="text-left font-display text-lg font-bold tracking-wider luxury-text-gradient">ABOLORE COUTURE</SheetTitle>
           </SheetHeader>
           <nav className="p-4 space-y-1">
             {user ? (
