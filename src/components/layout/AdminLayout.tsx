@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import {
   LayoutDashboard,
   Package,
@@ -94,7 +95,7 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
       >
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
-            <h1 className="font-display text-lg font-bold luxury-text-gradient">A.B.Couture</h1>
+            <img src={logo} alt="A.B.Couture" className="h-8 w-auto" />
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden"><X className="h-5 w-5" /></button>
           </div>
           <p className="text-xs text-muted-foreground mt-1">Admin Dashboard</p>
