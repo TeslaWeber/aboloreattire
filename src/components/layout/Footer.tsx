@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import { Facebook, Instagram, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DeliveryReturnsDialog from "@/components/DeliveryReturnsDialog";
@@ -40,9 +41,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
           <div>
-            <h4 className="font-display text-xl font-bold luxury-text-gradient mb-4">
-              A.B.Couture
-            </h4>
+            <img src={logo} alt="A.B.Couture" className="h-10 w-auto mb-4" />
             <p className="text-muted-foreground text-sm mb-4">
               Discover luxury fashion, accessories, and beauty products curated for the modern connoisseur.
             </p>
