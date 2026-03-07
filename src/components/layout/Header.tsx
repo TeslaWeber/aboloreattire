@@ -240,7 +240,7 @@ const Header = () => {
             </div>
 
             <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-              <h1 className="font-display text-[14px] font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap">
+              <h1 className={`font-display font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap transition-all duration-500 ease-in-out ${isCondensed ? 'text-[12px]' : 'text-[14px]'}`}>
                 ABOLORE COUTURE
               </h1>
             </Link>
