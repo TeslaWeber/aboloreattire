@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Settings, CreditCard, Upload, Palette, Timer } from "lucide-react";
+import { Settings, CreditCard, Upload, Palette, Timer, MessageSquare } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -186,6 +188,8 @@ const AdminSettings = () => {
   const [paymentMode, setPaymentMode] = useState<string>("paystack");
   const [selectedTheme, setSelectedTheme] = useState<string>("gold");
   const [tickerSpeed, setTickerSpeed] = useState<number>(60);
+  const [tickerMessage, setTickerMessage] = useState<string>("Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping");
+  const [savingMessage, setSavingMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -217,6 +221,15 @@ const AdminSettings = () => {
       .maybeSingle();
     if (tickerData) {
       setTickerSpeed(Number(tickerData.value));
+    }
+
+    const { data: messageData } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "ticker_message")
+      .maybeSingle();
+    if (messageData) {
+      setTickerMessage(messageData.value);
     }
     setLoading(false);
   };
@@ -268,6 +281,34 @@ const AdminSettings = () => {
       toast({ title: "Error", description: "Failed to save theme.", variant: "destructive" });
     } else {
       toast({ title: "Theme Updated", description: `Site theme changed to ${themeOptions.find(t => t.id === themeId)?.name}.` });
+    }
+  };
+
+  const handleSaveMessage = async () => {
+    setSavingMessage(true);
+    const { data: existing } = await supabase
+      .from("site_settings")
+      .select("id")
+      .eq("key", "ticker_message")
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase
+        .from("site_settings")
+        .update({ value: tickerMessage, updated_at: new Date().toISOString() })
+        .eq("key", "ticker_message"));
+    } else {
+      ({ error } = await supabase
+        .from("site_settings")
+        .insert({ key: "ticker_message", value: tickerMessage }));
+    }
+
+    setSavingMessage(false);
+    if (error) {
+      toast({ title: "Error", description: "Failed to save ticker message.", variant: "destructive" });
+    } else {
+      toast({ title: "Ticker Message Updated", description: "The announcement bar text has been updated." });
     }
   };
 
@@ -369,6 +410,28 @@ const AdminSettings = () => {
                 }
               }}
             />
+          </div>
+        </div>
+
+        {/* Ticker Message */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            Ticker Message
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Customize the announcement bar text shown across the site
+          </p>
+          <div className="space-y-3">
+            <Textarea
+              value={tickerMessage}
+              onChange={(e) => setTickerMessage(e.target.value)}
+              placeholder="Enter your announcement message..."
+              className="min-h-[80px] text-sm"
+            />
+            <Button onClick={handleSaveMessage} disabled={savingMessage} size="sm">
+              {savingMessage ? "Saving..." : "Save Message"}
+            </Button>
           </div>
         </div>
 
