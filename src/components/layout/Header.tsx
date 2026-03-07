@@ -211,11 +211,11 @@ const Header = () => {
           <div className={`flex lg:hidden items-center justify-between px-1 transition-all duration-500 ease-in-out ${isCondensed ? 'h-11' : 'h-14'}`}>
             <div className="flex items-center shrink-0 -ml-2">
               <button
-                className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
+                className="relative p-2 text-foreground/70 hover:text-primary transition-all duration-500"
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-label="Menu"
               >
-                <Menu className="h-5 w-5 stroke-[1.5]" />
+                <Menu className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-4 w-4' : 'h-5 w-5'}`} />
                 {(hasAdminNotification && isAdmin) && (
                   <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full" />
                 )}
@@ -223,18 +223,18 @@ const Header = () => {
               {user ? (
                 <Link
                   to="/account"
-                  className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300"
+                  className="relative p-1.5 text-foreground/70 hover:text-primary transition-all duration-500"
                   onClick={() => { setHasNotification(false); localStorage.setItem('last-order-check', new Date().toISOString()); }}
                   aria-label="Account"
                 >
-                  <User className="h-[17px] w-[17px] stroke-[1.5]" />
+                  <User className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
                   {hasNotification && (
                     <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 bg-destructive rounded-full" />
                   )}
                 </Link>
               ) : (
-                <Link to="/auth?mode=signin" className="p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Sign In">
-                  <User className="h-[17px] w-[17px] stroke-[1.5]" />
+                <Link to="/auth?mode=signin" className="p-1.5 text-foreground/70 hover:text-primary transition-all duration-500" aria-label="Sign In">
+                  <User className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
                 </Link>
               )}
             </div>
@@ -246,19 +246,19 @@ const Header = () => {
             </Link>
 
             <div className="flex items-center shrink-0 -mr-1.5">
-              <Link to="/wishlist" className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Wishlist">
-                <Heart className="h-[17px] w-[17px] stroke-[1.5]" />
+              <Link to="/wishlist" className="relative p-1.5 text-foreground/70 hover:text-primary transition-all duration-500" aria-label="Wishlist">
+                <Heart className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
                 {wishlistTotal > 0 && (
                   <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-semibold rounded-full h-3.5 w-3.5 flex items-center justify-center">
                     {wishlistTotal}
                   </span>
                 )}
               </Link>
-              <button onClick={() => setIsSearchOpen(true)} className="p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Search">
-                <Search className="h-[17px] w-[17px] stroke-[1.5]" />
+              <button onClick={() => setIsSearchOpen(true)} className="p-1.5 text-foreground/70 hover:text-primary transition-all duration-500" aria-label="Search">
+                <Search className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
               </button>
-              <button onClick={() => setIsCartOpen(true)} className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Cart">
-                <ShoppingBag className="h-[17px] w-[17px] stroke-[1.5]" />
+              <button onClick={() => setIsCartOpen(true)} className="relative p-1.5 text-foreground/70 hover:text-primary transition-all duration-500" aria-label="Cart">
+                <ShoppingBag className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
                 {totalItems > 0 && (
                   <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-semibold rounded-full h-3.5 w-3.5 flex items-center justify-center">
                     {totalItems}
