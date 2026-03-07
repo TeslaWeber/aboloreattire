@@ -9,7 +9,7 @@
 
 /* ABOLORE COUTURE - Luxury Dark Design System */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -98,6 +98,10 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', serif;
+  }
+
+  .font-display {
+    font-family: 'Cormorant Garamond', serif !important;
   }
 
   /* Ensure images don't overflow on mobile */

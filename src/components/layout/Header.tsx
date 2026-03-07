@@ -103,93 +103,131 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full">
       {/* News Flash Ticker */}
       <div className="bg-primary text-primary-foreground overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap py-1.5 text-xs font-medium inline-flex">
-          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
-          <span className="mx-8">Welcome to ABOLORE COUTURE. Thank you for choosing us. Enjoy your shopping.</span>
+        <div className="animate-marquee whitespace-nowrap py-1.5 text-[11px] tracking-widest uppercase font-light inline-flex">
+          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
+          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
         </div>
       </div>
 
       {/* Main Header */}
-      <div className="bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Mobile Menu Button */}
-            <button
-              className="lg:hidden relative p-2 hover:bg-muted rounded-md transition-colors"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-              {(hasAdminNotification && isAdmin) && (
-                <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-destructive rounded-full border-2 border-background" />
-              )}
-            </button>
-
-            {/* Logo */}
-            <Link to="/" className="flex items-center">
-              <h1 className="font-display text-xl lg:text-2xl font-bold tracking-wider luxury-text-gradient">ABOLORE COUTURE</h1>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
-              <Link to="/products" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
-                All Products
-              </Link>
-              {isAdmin && (
-                <Link to="/admin" className="relative text-sm font-medium text-foreground/80 hover:text-primary transition-colors">
-                  Admin Dashboard
-                  {hasAdminNotification && (
-                    <span className="absolute -top-1 -right-3 h-2.5 w-2.5 bg-destructive rounded-full" />
-                  )}
+      <div className="bg-background/98 backdrop-blur-xl border-b border-border/50">
+        <div className="container mx-auto px-4 lg:px-8">
+          {/* Desktop: Three-row premium layout */}
+          <div className="hidden lg:block">
+            {/* Top row - minimal nav links */}
+            <div className="flex items-center justify-between py-2 text-[11px] tracking-widest uppercase">
+              <nav className="flex items-center gap-8">
+                <Link to="/products" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+                  Shop All
                 </Link>
-              )}
-            </nav>
+                {isAdmin && (
+                  <Link to="/admin" className="relative text-muted-foreground hover:text-primary transition-colors duration-300">
+                    Dashboard
+                    {hasAdminNotification && (
+                      <span className="absolute -top-0.5 -right-2.5 h-1.5 w-1.5 bg-destructive rounded-full" />
+                    )}
+                  </Link>
+                )}
+              </nav>
+              <div className="flex items-center gap-6">
+                {user ? (
+                  <Link
+                    to="/account"
+                    className="relative text-muted-foreground hover:text-primary transition-colors duration-300"
+                    onClick={() => { setHasNotification(false); localStorage.setItem('last-order-check', new Date().toISOString()); }}
+                  >
+                    Account
+                    {hasNotification && (
+                      <span className="absolute -top-0.5 -right-2.5 h-1.5 w-1.5 bg-destructive rounded-full" />
+                    )}
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/auth?mode=signin" className="text-muted-foreground hover:text-primary transition-colors duration-300">Sign In</Link>
+                    <Link to="/auth?mode=signup" className="text-muted-foreground hover:text-primary transition-colors duration-300">Register</Link>
+                  </>
+                )}
+              </div>
+            </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2 lg:gap-4">
-              <button onClick={() => setIsSearchOpen(true)} className="p-2 hover:bg-muted rounded-full transition-colors">
-                <Search className="h-5 w-5" />
+            {/* Thin divider */}
+            <div className="h-px bg-border/40" />
+
+            {/* Center row - brand name */}
+            <div className="flex items-center justify-center py-5">
+              <Link to="/" className="group">
+                <h1 className="font-display text-3xl lg:text-4xl font-light tracking-[0.35em] uppercase luxury-text-gradient transition-opacity duration-300 group-hover:opacity-80">
+                  ABOLORE COUTURE
+                </h1>
+              </Link>
+            </div>
+
+            {/* Thin divider */}
+            <div className="h-px bg-border/40" />
+
+            {/* Bottom row - icon actions */}
+            <div className="flex items-center justify-center gap-10 py-3">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 text-foreground/60 hover:text-primary transition-colors duration-300"
+                aria-label="Search"
+              >
+                <Search className="h-[18px] w-[18px] stroke-[1.5]" />
               </button>
 
-              <Link to="/wishlist" className="relative p-2 hover:bg-muted rounded-full transition-colors">
-                <Heart className="h-5 w-5" />
+              <Link to="/wishlist" className="relative p-2 text-foreground/60 hover:text-primary transition-colors duration-300" aria-label="Wishlist">
+                <Heart className="h-[18px] w-[18px] stroke-[1.5]" />
                 {wishlistTotal > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                     {wishlistTotal}
                   </span>
                 )}
               </Link>
 
-              {user ? (
-                <Link
-                  to="/account"
-                  className="relative p-2 hover:bg-muted rounded-full transition-colors"
-                  onClick={() => { setHasNotification(false); localStorage.setItem('last-order-check', new Date().toISOString()); }}
-                >
-                  <User className="h-5 w-5" />
-                  {hasNotification && (
-                    <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-destructive rounded-full border-2 border-background" />
-                  )}
-                </Link>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-2 hover:bg-muted rounded-full transition-colors">
-                      <User className="h-5 w-5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem asChild><Link to="/auth?mode=signin">Sign In</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link to="/auth?mode=signup">Create Account</Link></DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-
-              <button onClick={() => setIsCartOpen(true)} className="relative p-2 hover:bg-muted rounded-full transition-colors">
-                <ShoppingBag className="h-5 w-5" />
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 text-foreground/60 hover:text-primary transition-colors duration-300"
+                aria-label="Cart"
+              >
+                <ShoppingBag className="h-[18px] w-[18px] stroke-[1.5]" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile layout */}
+          <div className="flex lg:hidden items-center justify-between h-14">
+            <button
+              className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Menu"
+            >
+              <Menu className="h-5 w-5 stroke-[1.5]" />
+              {(hasAdminNotification && isAdmin) && (
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full" />
+              )}
+            </button>
+
+            <Link to="/" className="absolute left-1/2 -translate-x-1/2">
+              <h1 className="font-display text-lg font-light tracking-[0.3em] uppercase luxury-text-gradient">
+                ABOLORE COUTURE
+              </h1>
+            </Link>
+
+            <div className="flex items-center gap-1">
+              <button onClick={() => setIsSearchOpen(true)} className="p-2 text-foreground/70 hover:text-primary transition-colors duration-300">
+                <Search className="h-[18px] w-[18px] stroke-[1.5]" />
+              </button>
+              <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300">
+                <ShoppingBag className="h-[18px] w-[18px] stroke-[1.5]" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 right-0 bg-primary text-primary-foreground text-[9px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                     {totalItems}
                   </span>
                 )}
@@ -201,16 +239,16 @@ const Header = () => {
 
       {/* Mobile Side Menu (Sheet) */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="w-72 p-0">
-          <SheetHeader className="p-6 border-b border-border">
-            <SheetTitle className="text-left font-display text-lg font-bold tracking-wider luxury-text-gradient">ABOLORE COUTURE</SheetTitle>
+        <SheetContent side="left" className="w-72 p-0 border-r border-border/30">
+          <SheetHeader className="px-6 pt-8 pb-6 border-b border-border/30">
+            <SheetTitle className="text-left font-display text-base font-light tracking-[0.3em] uppercase luxury-text-gradient">ABOLORE COUTURE</SheetTitle>
           </SheetHeader>
-          <nav className="p-4 space-y-1">
+          <nav className="p-5 space-y-0.5">
             {user ? (
               <>
                 <Link
                   to="/account"
-                  className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                  className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   My Account
@@ -218,7 +256,7 @@ const Header = () => {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="relative block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                    className="relative block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setHasAdminNotification(false);
@@ -227,44 +265,50 @@ const Header = () => {
                   >
                     Admin Dashboard
                     {hasAdminNotification && (
-                      <span className="absolute top-3 right-3 h-2.5 w-2.5 bg-destructive rounded-full" />
+                      <span className="absolute top-3.5 right-4 h-2 w-2 bg-destructive rounded-full" />
                     )}
                   </Link>
                 )}
+                <Link
+                  to="/wishlist"
+                  className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Wishlist
+                </Link>
                 <button
                   onClick={() => { setIsMobileMenuOpen(false); setSignOutDialogOpen(true); }}
-                  className="block w-full text-left py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                  className="block w-full text-left py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/auth?mode=signin" className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/auth?mode=signin" className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300" onClick={() => setIsMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link to="/auth?mode=signup" className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/auth?mode=signup" className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300" onClick={() => setIsMobileMenuOpen(false)}>
                   Create Account
                 </Link>
               </>
             )}
 
             {/* Features */}
-            <div className="pt-4 mt-4 border-t border-border space-y-1">
-              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
-                <Truck className="h-5 w-5 text-primary" />
+            <div className="pt-6 mt-6 border-t border-border/30 space-y-1">
+              <div className="flex items-center gap-3 py-2.5 px-4 text-foreground/50 text-xs tracking-wider uppercase">
+                <Truck className="h-4 w-4 text-primary/70" />
                 Swift & Safe Delivery
               </div>
-              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
-                <Shield className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-3 py-2.5 px-4 text-foreground/50 text-xs tracking-wider uppercase">
+                <Shield className="h-4 w-4 text-primary/70" />
                 Secure Payment
               </div>
-              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
-                <RefreshCw className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-3 py-2.5 px-4 text-foreground/50 text-xs tracking-wider uppercase">
+                <RefreshCw className="h-4 w-4 text-primary/70" />
                 Easy Returns
               </div>
             </div>
-
           </nav>
         </SheetContent>
       </Sheet>
