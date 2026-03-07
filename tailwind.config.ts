@@ -123,6 +123,7 @@ export default {
         "slide-in": "slide-in 0.5s ease-out forwards",
         float: "float 3s ease-in-out infinite",
         marquee: "marquee 20s linear infinite",
+        "marquee-slow": "marquee 40s linear infinite",
       },
     },
   },
