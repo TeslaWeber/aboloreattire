@@ -208,7 +208,7 @@ const Header = () => {
             </div>
           </div>
 
-          <div className="flex lg:hidden items-center justify-between h-14 gap-2">
+          <div className="flex lg:hidden items-center justify-between h-14 px-1">
             <button
               className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300 shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
