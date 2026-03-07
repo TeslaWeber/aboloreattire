@@ -208,9 +208,9 @@ const Header = () => {
             </div>
           </div>
 
-          <div className="flex lg:hidden items-center justify-between h-14">
+          <div className="flex lg:hidden items-center justify-between h-14 gap-2">
             <button
-              className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
+              className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300 shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Menu"
             >
@@ -220,45 +220,45 @@ const Header = () => {
               )}
             </button>
 
-            <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-              <h1 className="font-display text-[15px] font-light tracking-[0.25em] uppercase luxury-text-gradient whitespace-nowrap">
+            <Link to="/" className="min-w-0 flex-1 flex justify-center">
+              <h1 className="font-display text-[14px] font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap">
                 ABOLORE COUTURE
               </h1>
             </Link>
 
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center shrink-0">
               {user ? (
                 <Link
                   to="/account"
-                  className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
+                  className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300"
                   onClick={() => { setHasNotification(false); localStorage.setItem('last-order-check', new Date().toISOString()); }}
                   aria-label="Account"
                 >
-                  <User className="h-[18px] w-[18px] stroke-[1.5]" />
+                  <User className="h-[17px] w-[17px] stroke-[1.5]" />
                   {hasNotification && (
-                    <span className="absolute top-1 right-1 h-1.5 w-1.5 bg-destructive rounded-full" />
+                    <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 bg-destructive rounded-full" />
                   )}
                 </Link>
               ) : (
-                <Link to="/auth?mode=signin" className="p-2 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Sign In">
-                  <User className="h-[18px] w-[18px] stroke-[1.5]" />
+                <Link to="/auth?mode=signin" className="p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Sign In">
+                  <User className="h-[17px] w-[17px] stroke-[1.5]" />
                 </Link>
               )}
-              <Link to="/wishlist" className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Wishlist">
-                <Heart className="h-[18px] w-[18px] stroke-[1.5]" />
+              <Link to="/wishlist" className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Wishlist">
+                <Heart className="h-[17px] w-[17px] stroke-[1.5]" />
                 {wishlistTotal > 0 && (
-                  <span className="absolute top-0.5 right-0 bg-primary text-primary-foreground text-[8px] font-semibold rounded-full h-3.5 w-3.5 flex items-center justify-center">
+                  <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-semibold rounded-full h-3.5 w-3.5 flex items-center justify-center">
                     {wishlistTotal}
                   </span>
                 )}
               </Link>
-              <button onClick={() => setIsSearchOpen(true)} className="p-2 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Search">
-                <Search className="h-[18px] w-[18px] stroke-[1.5]" />
+              <button onClick={() => setIsSearchOpen(true)} className="p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Search">
+                <Search className="h-[17px] w-[17px] stroke-[1.5]" />
               </button>
-              <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Cart">
-                <ShoppingBag className="h-[18px] w-[18px] stroke-[1.5]" />
+              <button onClick={() => setIsCartOpen(true)} className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Cart">
+                <ShoppingBag className="h-[17px] w-[17px] stroke-[1.5]" />
                 {totalItems > 0 && (
-                  <span className="absolute top-0.5 right-0 bg-primary text-primary-foreground text-[8px] font-semibold rounded-full h-3.5 w-3.5 flex items-center justify-center">
+                  <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-semibold rounded-full h-3.5 w-3.5 flex items-center justify-center">
                     {totalItems}
                   </span>
                 )}
