@@ -190,6 +190,7 @@ const AdminSettings = () => {
   const [tickerSpeed, setTickerSpeed] = useState<number>(60);
   const [tickerMessages, setTickerMessages] = useState<string[]>(["Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping"]);
   const [savingMessages, setSavingMessages] = useState(false);
+  const [displayDuration, setDisplayDuration] = useState<number>(8);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -233,6 +234,15 @@ const AdminSettings = () => {
         const parsed = JSON.parse(messageData.value);
         if (Array.isArray(parsed) && parsed.length > 0) setTickerMessages(parsed);
       } catch {}
+    }
+
+    const { data: durationData } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "ticker_display_duration")
+      .maybeSingle();
+    if (durationData) {
+      setDisplayDuration(Number(durationData.value));
     }
     setLoading(false);
   };
@@ -418,6 +428,55 @@ const AdminSettings = () => {
                   toast({ title: "Error", description: "Failed to save ticker speed.", variant: "destructive" });
                 } else {
                   toast({ title: "Ticker Speed Updated", description: `Scroll speed set to ${val}s per cycle.` });
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Message Display Duration */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
+            <Timer className="h-5 w-5 text-primary" />
+            Message Display Duration
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            How long each ticker message stays visible before rotating ({displayDuration}s)
+          </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Quick (3s)</span>
+              <span>Long (20s)</span>
+            </div>
+            <Slider
+              value={[displayDuration]}
+              min={3}
+              max={20}
+              step={1}
+              onValueChange={([val]) => setDisplayDuration(val)}
+              onValueCommit={async ([val]) => {
+                const { data: existing } = await supabase
+                  .from("site_settings")
+                  .select("id")
+                  .eq("key", "ticker_display_duration")
+                  .maybeSingle();
+
+                let error;
+                if (existing) {
+                  ({ error } = await supabase
+                    .from("site_settings")
+                    .update({ value: String(val), updated_at: new Date().toISOString() })
+                    .eq("key", "ticker_display_duration"));
+                } else {
+                  ({ error } = await supabase
+                    .from("site_settings")
+                    .insert({ key: "ticker_display_duration", value: String(val) }));
+                }
+
+                if (error) {
+                  toast({ title: "Error", description: "Failed to save display duration.", variant: "destructive" });
+                } else {
+                  toast({ title: "Display Duration Updated", description: `Each message will show for ${val}s before rotating.` });
                 }
               }}
             />
