@@ -209,24 +209,17 @@ const Header = () => {
           </div>
 
           <div className="flex lg:hidden items-center justify-between h-14 px-1">
-            <button
-              className="relative p-2 -ml-2 text-foreground/70 hover:text-primary transition-colors duration-300 shrink-0"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Menu"
-            >
-              <Menu className="h-5 w-5 stroke-[1.5]" />
-              {(hasAdminNotification && isAdmin) && (
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full" />
-              )}
-            </button>
-
-            <Link to="/" className="min-w-0 flex-1 flex justify-center">
-              <h1 className="font-display text-[14px] font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap">
-                ABOLORE COUTURE
-              </h1>
-            </Link>
-
-            <div className="flex items-center shrink-0 -mr-1.5">
+            <div className="flex items-center shrink-0 -ml-2">
+              <button
+                className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
+                onClick={() => setIsMobileMenuOpen(true)}
+                aria-label="Menu"
+              >
+                <Menu className="h-5 w-5 stroke-[1.5]" />
+                {(hasAdminNotification && isAdmin) && (
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full" />
+                )}
+              </button>
               {user ? (
                 <Link
                   to="/account"
@@ -244,6 +237,15 @@ const Header = () => {
                   <User className="h-[17px] w-[17px] stroke-[1.5]" />
                 </Link>
               )}
+            </div>
+
+            <Link to="/" className="absolute left-1/2 -translate-x-1/2">
+              <h1 className="font-display text-[14px] font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap">
+                ABOLORE COUTURE
+              </h1>
+            </Link>
+
+            <div className="flex items-center shrink-0 -mr-1.5">
               <Link to="/wishlist" className="relative p-1.5 text-foreground/70 hover:text-primary transition-colors duration-300" aria-label="Wishlist">
                 <Heart className="h-[17px] w-[17px] stroke-[1.5]" />
                 {wishlistTotal > 0 && (
