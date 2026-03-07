@@ -12,16 +12,18 @@ const TickerBar = ({ isCondensed }: TickerBarProps) => {
   const [speed, setSpeed] = useState(60);
   const [messages, setMessages] = useState<string[]>(DEFAULT_MESSAGES);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayDuration, setDisplayDuration] = useState(8);
 
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key, value")
-        .in("key", ["ticker_speed", "ticker_messages", "ticker_message"]);
+        .in("key", ["ticker_speed", "ticker_messages", "ticker_message", "ticker_display_duration"]);
       if (data) {
         data.forEach((row) => {
           if (row.key === "ticker_speed") setSpeed(Number(row.value));
+          if (row.key === "ticker_display_duration") setDisplayDuration(Number(row.value));
           if (row.key === "ticker_messages") {
             try {
               const parsed = JSON.parse(row.value);
@@ -37,6 +39,7 @@ const TickerBar = ({ isCondensed }: TickerBarProps) => {
       .channel("ticker-settings")
       .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload: any) => {
         if (payload.new?.key === "ticker_speed") setSpeed(Number(payload.new.value));
+        if (payload.new?.key === "ticker_display_duration") setDisplayDuration(Number(payload.new.value));
         if (payload.new?.key === "ticker_messages") {
           try {
             const parsed = JSON.parse(payload.new.value);
@@ -56,9 +59,9 @@ const TickerBar = ({ isCondensed }: TickerBarProps) => {
     if (messages.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % messages.length);
-    }, 8000);
+    }, displayDuration * 1000);
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [messages.length, displayDuration]);
 
   const currentMessage = messages[currentIndex] || messages[0];
 
