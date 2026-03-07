@@ -413,6 +413,28 @@ const AdminSettings = () => {
           </div>
         </div>
 
+        {/* Ticker Message */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            Ticker Message
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Customize the announcement bar text shown across the site
+          </p>
+          <div className="space-y-3">
+            <Textarea
+              value={tickerMessage}
+              onChange={(e) => setTickerMessage(e.target.value)}
+              placeholder="Enter your announcement message..."
+              className="min-h-[80px] text-sm"
+            />
+            <Button onClick={handleSaveMessage} disabled={savingMessage} size="sm">
+              {savingMessage ? "Saving..." : "Save Message"}
+            </Button>
+          </div>
+        </div>
+
         {/* Theme Color */}
         <div className="bg-card border border-border rounded-xl p-6">
           <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
