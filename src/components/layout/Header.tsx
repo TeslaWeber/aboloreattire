@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ShoppingBag, Menu, Truck, Shield, RefreshCw, Heart } from "lucide-react";
+import { User, ShoppingBag, Menu, Truck, Shield, RefreshCw, Heart } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
-import SearchDialog from "@/components/search/SearchDialog";
+
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sheet,
@@ -32,7 +32,7 @@ import {
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
   const [isCondensed, setIsCondensed] = useState(false);
 
@@ -110,7 +110,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full">
       {/* News Flash Ticker */}
       <div className={`bg-primary text-primary-foreground overflow-hidden transition-all duration-500 ease-in-out ${isCondensed ? 'opacity-70 py-0' : 'opacity-100'}`}>
-        <div className={`animate-marquee whitespace-nowrap text-[11px] tracking-widest uppercase font-light inline-flex transition-all duration-500 ${isCondensed ? 'py-1' : 'py-1.5'}`}>
+        <div className={`animate-marquee-slow whitespace-nowrap text-[11px] tracking-widest uppercase font-light inline-flex transition-all duration-500 ${isCondensed ? 'py-1' : 'py-1.5'}`}>
           <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
           <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
           <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
@@ -176,14 +176,6 @@ const Header = () => {
 
             {/* Bottom row - icon actions */}
             <div className={`flex items-center justify-center gap-10 transition-all duration-500 ease-in-out ${isCondensed ? 'py-1.5' : 'py-3'}`}>
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-foreground/60 hover:text-primary transition-colors duration-300"
-                aria-label="Search"
-              >
-                <Search className="h-[18px] w-[18px] stroke-[1.5]" />
-              </button>
-
               <Link to="/wishlist" className="relative p-2 text-foreground/60 hover:text-primary transition-colors duration-300" aria-label="Wishlist">
                 <Heart className="h-[18px] w-[18px] stroke-[1.5]" />
                 {wishlistTotal > 0 && (
@@ -254,9 +246,6 @@ const Header = () => {
                   </span>
                 )}
               </Link>
-              <button onClick={() => setIsSearchOpen(true)} className="p-1.5 text-foreground/70 hover:text-primary transition-all duration-500" aria-label="Search">
-                <Search className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
-              </button>
               <button onClick={() => setIsCartOpen(true)} className="relative p-1.5 text-foreground/70 hover:text-primary transition-all duration-500" aria-label="Cart">
                 <ShoppingBag className={`stroke-[1.5] transition-all duration-500 ${isCondensed ? 'h-[14px] w-[14px]' : 'h-[17px] w-[17px]'}`} />
                 {totalItems > 0 && (
@@ -284,7 +273,7 @@ const Header = () => {
                   className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  My Account
+                  Profile
                 </Link>
                 {isAdmin && (
                   <Link
@@ -302,13 +291,6 @@ const Header = () => {
                     )}
                   </Link>
                 )}
-                <Link
-                  to="/wishlist"
-                  className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Wishlist
-                </Link>
                 <button
                   onClick={() => { setIsMobileMenuOpen(false); setSignOutDialogOpen(true); }}
                   className="block w-full text-left py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
@@ -345,9 +327,6 @@ const Header = () => {
           </nav>
         </SheetContent>
       </Sheet>
-
-      {/* Search Dialog */}
-      <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
 
       {/* Sign Out Confirmation */}
       <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
