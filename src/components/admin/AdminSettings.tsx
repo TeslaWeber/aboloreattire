@@ -188,6 +188,8 @@ const AdminSettings = () => {
   const [paymentMode, setPaymentMode] = useState<string>("paystack");
   const [selectedTheme, setSelectedTheme] = useState<string>("gold");
   const [tickerSpeed, setTickerSpeed] = useState<number>(60);
+  const [tickerMessage, setTickerMessage] = useState<string>("Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping");
+  const [savingMessage, setSavingMessage] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -219,6 +221,15 @@ const AdminSettings = () => {
       .maybeSingle();
     if (tickerData) {
       setTickerSpeed(Number(tickerData.value));
+    }
+
+    const { data: messageData } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "ticker_message")
+      .maybeSingle();
+    if (messageData) {
+      setTickerMessage(messageData.value);
     }
     setLoading(false);
   };
