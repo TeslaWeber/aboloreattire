@@ -124,7 +124,7 @@ const Header = () => {
           {/* Desktop: Three-row premium layout */}
           <div className="hidden lg:block">
             {/* Top row - minimal nav links */}
-            <div className="flex items-center justify-between py-2 text-[11px] tracking-widest uppercase">
+            <div className={`flex items-center justify-between text-[11px] tracking-widest uppercase transition-all duration-500 ease-in-out ${isCondensed ? 'py-1' : 'py-2'}`}>
               <nav className="flex items-center gap-8">
                 <Link to="/products" className="text-muted-foreground hover:text-primary transition-colors duration-300">
                   Shop All
