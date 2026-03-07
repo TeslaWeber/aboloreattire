@@ -284,6 +284,34 @@ const AdminSettings = () => {
     }
   };
 
+  const handleSaveMessage = async () => {
+    setSavingMessage(true);
+    const { data: existing } = await supabase
+      .from("site_settings")
+      .select("id")
+      .eq("key", "ticker_message")
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase
+        .from("site_settings")
+        .update({ value: tickerMessage, updated_at: new Date().toISOString() })
+        .eq("key", "ticker_message"));
+    } else {
+      ({ error } = await supabase
+        .from("site_settings")
+        .insert({ key: "ticker_message", value: tickerMessage }));
+    }
+
+    setSavingMessage(false);
+    if (error) {
+      toast({ title: "Error", description: "Failed to save ticker message.", variant: "destructive" });
+    } else {
+      toast({ title: "Ticker Message Updated", description: "The announcement bar text has been updated." });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
