@@ -210,7 +210,7 @@ const Header = () => {
 
           <div className="flex lg:hidden items-center justify-between h-14 px-1">
             <button
-              className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300 shrink-0"
+              className="relative p-2 -ml-2 text-foreground/70 hover:text-primary transition-colors duration-300 shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Menu"
             >
@@ -226,7 +226,7 @@ const Header = () => {
               </h1>
             </Link>
 
-            <div className="flex items-center shrink-0">
+            <div className="flex items-center shrink-0 -mr-1.5">
               {user ? (
                 <Link
                   to="/account"
