@@ -109,14 +109,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* News Flash Ticker */}
-      <div className={`bg-primary text-primary-foreground overflow-hidden transition-all duration-500 ease-in-out ${isCondensed ? 'opacity-70 py-0' : 'opacity-100'}`}>
-        <div className={`animate-marquee-slow whitespace-nowrap text-[11px] tracking-widest uppercase font-light inline-flex transition-all duration-500 ${isCondensed ? 'py-1' : 'py-1.5'}`}>
-          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
-          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
-          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
-          <span className="mx-8">Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping</span>
-        </div>
-      </div>
+      <TickerBar isCondensed={isCondensed} />
 
       {/* Main Header */}
       <div className="bg-background/98 backdrop-blur-xl border-b border-border/50">
