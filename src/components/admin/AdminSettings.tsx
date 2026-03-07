@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Settings, CreditCard, Upload, Palette, Timer, MessageSquare } from "lucide-react";
+import { Settings, CreditCard, Upload, Palette, Timer, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -188,8 +188,8 @@ const AdminSettings = () => {
   const [paymentMode, setPaymentMode] = useState<string>("paystack");
   const [selectedTheme, setSelectedTheme] = useState<string>("gold");
   const [tickerSpeed, setTickerSpeed] = useState<number>(60);
-  const [tickerMessage, setTickerMessage] = useState<string>("Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping");
-  const [savingMessage, setSavingMessage] = useState(false);
+  const [tickerMessages, setTickerMessages] = useState<string[]>(["Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping"]);
+  const [savingMessages, setSavingMessages] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -226,10 +226,13 @@ const AdminSettings = () => {
     const { data: messageData } = await supabase
       .from("site_settings")
       .select("value")
-      .eq("key", "ticker_message")
+      .eq("key", "ticker_messages")
       .maybeSingle();
     if (messageData) {
-      setTickerMessage(messageData.value);
+      try {
+        const parsed = JSON.parse(messageData.value);
+        if (Array.isArray(parsed) && parsed.length > 0) setTickerMessages(parsed);
+      } catch {}
     }
     setLoading(false);
   };
@@ -284,31 +287,39 @@ const AdminSettings = () => {
     }
   };
 
-  const handleSaveMessage = async () => {
-    setSavingMessage(true);
+  const handleSaveMessages = async () => {
+    const filtered = tickerMessages.filter((m) => m.trim().length > 0);
+    if (filtered.length === 0) {
+      toast({ title: "Error", description: "Add at least one message.", variant: "destructive" });
+      return;
+    }
+    setSavingMessages(true);
+    const value = JSON.stringify(filtered);
+
     const { data: existing } = await supabase
       .from("site_settings")
       .select("id")
-      .eq("key", "ticker_message")
+      .eq("key", "ticker_messages")
       .maybeSingle();
 
     let error;
     if (existing) {
       ({ error } = await supabase
         .from("site_settings")
-        .update({ value: tickerMessage, updated_at: new Date().toISOString() })
-        .eq("key", "ticker_message"));
+        .update({ value, updated_at: new Date().toISOString() })
+        .eq("key", "ticker_messages"));
     } else {
       ({ error } = await supabase
         .from("site_settings")
-        .insert({ key: "ticker_message", value: tickerMessage }));
+        .insert({ key: "ticker_messages", value }));
     }
 
-    setSavingMessage(false);
+    setSavingMessages(false);
+    setTickerMessages(filtered);
     if (error) {
-      toast({ title: "Error", description: "Failed to save ticker message.", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to save ticker messages.", variant: "destructive" });
     } else {
-      toast({ title: "Ticker Message Updated", description: "The announcement bar text has been updated." });
+      toast({ title: "Ticker Messages Updated", description: `${filtered.length} message(s) saved and will rotate on the site.` });
     }
   };
 
@@ -413,25 +424,54 @@ const AdminSettings = () => {
           </div>
         </div>
 
-        {/* Ticker Message */}
+        {/* Ticker Messages */}
         <div className="bg-card border border-border rounded-xl p-6">
           <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-primary" />
-            Ticker Message
+            Ticker Messages
           </h3>
           <p className="text-xs text-muted-foreground mb-4">
-            Customize the announcement bar text shown across the site
+            Add multiple messages — they'll rotate on the announcement bar
           </p>
           <div className="space-y-3">
-            <Textarea
-              value={tickerMessage}
-              onChange={(e) => setTickerMessage(e.target.value)}
-              placeholder="Enter your announcement message..."
-              className="min-h-[80px] text-sm"
-            />
-            <Button onClick={handleSaveMessage} disabled={savingMessage} size="sm">
-              {savingMessage ? "Saving..." : "Save Message"}
-            </Button>
+            {tickerMessages.map((msg, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input
+                  value={msg}
+                  onChange={(e) => {
+                    const updated = [...tickerMessages];
+                    updated[i] = e.target.value;
+                    setTickerMessages(updated);
+                  }}
+                  placeholder={`Message ${i + 1}`}
+                  className="text-sm"
+                />
+                {tickerMessages.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 text-destructive hover:text-destructive"
+                    onClick={() => setTickerMessages(tickerMessages.filter((_, j) => j !== i))}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTickerMessages([...tickerMessages, ""])}
+                disabled={tickerMessages.length >= 10}
+              >
+                <Plus className="h-4 w-4 mr-1" /> Add Message
+              </Button>
+              <Button onClick={handleSaveMessages} disabled={savingMessages} size="sm">
+                {savingMessages ? "Saving..." : "Save Messages"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Up to 10 messages. Each displays for ~8 seconds before fading to the next.</p>
           </div>
         </div>
 
