@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Settings, CreditCard, Upload, Palette } from "lucide-react";
+import { Settings, CreditCard, Upload, Palette, Timer } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -184,6 +185,7 @@ const AdminSettings = () => {
   const { toast } = useToast();
   const [paymentMode, setPaymentMode] = useState<string>("paystack");
   const [selectedTheme, setSelectedTheme] = useState<string>("gold");
+  const [tickerSpeed, setTickerSpeed] = useState<number>(60);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -206,6 +208,15 @@ const AdminSettings = () => {
     if (themeData) {
       setSelectedTheme(themeData.value);
       applyTheme(themeData.value);
+    }
+
+    const { data: tickerData } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "ticker_speed")
+      .maybeSingle();
+    if (tickerData) {
+      setTickerSpeed(Number(tickerData.value));
     }
     setLoading(false);
   };
@@ -309,6 +320,55 @@ const AdminSettings = () => {
             <p className="text-xs text-muted-foreground">
               Toggle to switch between Paystack online payment and manual receipt upload.
             </p>
+          </div>
+        </div>
+
+        {/* Ticker Speed */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
+            <Timer className="h-5 w-5 text-primary" />
+            News Ticker Speed
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Control how fast the announcement bar scrolls ({tickerSpeed}s per cycle)
+          </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Fast (15s)</span>
+              <span>Slow (120s)</span>
+            </div>
+            <Slider
+              value={[tickerSpeed]}
+              min={15}
+              max={120}
+              step={5}
+              onValueChange={([val]) => setTickerSpeed(val)}
+              onValueCommit={async ([val]) => {
+                const { data: existing } = await supabase
+                  .from("site_settings")
+                  .select("id")
+                  .eq("key", "ticker_speed")
+                  .maybeSingle();
+
+                let error;
+                if (existing) {
+                  ({ error } = await supabase
+                    .from("site_settings")
+                    .update({ value: String(val), updated_at: new Date().toISOString() })
+                    .eq("key", "ticker_speed"));
+                } else {
+                  ({ error } = await supabase
+                    .from("site_settings")
+                    .insert({ key: "ticker_speed", value: String(val) }));
+                }
+
+                if (error) {
+                  toast({ title: "Error", description: "Failed to save ticker speed.", variant: "destructive" });
+                } else {
+                  toast({ title: "Ticker Speed Updated", description: `Scroll speed set to ${val}s per cycle.` });
+                }
+              }}
+            />
           </div>
         </div>
 
