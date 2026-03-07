@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import TickerBar from "@/components/layout/TickerBar";
 import { User, ShoppingBag, Menu, Truck, Shield, RefreshCw, Heart } from "lucide-react";
 
 import { useState, useEffect } from "react";
