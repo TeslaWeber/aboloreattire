@@ -34,6 +34,13 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
+  const [isCondensed, setIsCondensed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsCondensed(window.scrollY > 40);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const { totalItems, setIsCartOpen } = useCart();
   const { totalItems: wishlistTotal } = useWishlist();
   const { user, signOut, isAdmin } = useAuth();
