@@ -226,7 +226,7 @@ const Header = () => {
               </h1>
             </Link>
 
-            <div className="flex items-center shrink-0">
+            <div className="flex items-center shrink-0 -mr-1.5">
               {user ? (
                 <Link
                   to="/account"
