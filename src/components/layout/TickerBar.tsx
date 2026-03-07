@@ -5,32 +5,36 @@ interface TickerBarProps {
   isCondensed: boolean;
 }
 
+const DEFAULT_MESSAGE = "Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping";
+
 const TickerBar = ({ isCondensed }: TickerBarProps) => {
   const [speed, setSpeed] = useState(60);
+  const [message, setMessage] = useState(DEFAULT_MESSAGE);
 
   useEffect(() => {
-    const fetchSpeed = async () => {
+    const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
-        .select("value")
-        .eq("key", "ticker_speed")
-        .maybeSingle();
-      if (data) setSpeed(Number(data.value));
+        .select("key, value")
+        .in("key", ["ticker_speed", "ticker_message"]);
+      if (data) {
+        data.forEach((row) => {
+          if (row.key === "ticker_speed") setSpeed(Number(row.value));
+          if (row.key === "ticker_message") setMessage(row.value);
+        });
+      }
     };
-    fetchSpeed();
+    fetchSettings();
 
     const channel = supabase
-      .channel("ticker-speed")
+      .channel("ticker-settings")
       .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload: any) => {
-        if (payload.new?.key === "ticker_speed") {
-          setSpeed(Number(payload.new.value));
-        }
+        if (payload.new?.key === "ticker_speed") setSpeed(Number(payload.new.value));
+        if (payload.new?.key === "ticker_message") setMessage(payload.new.value);
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
-
-  const message = "Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping";
 
   return (
     <div className={`bg-primary text-primary-foreground overflow-hidden transition-all duration-500 ease-in-out ${isCondensed ? 'opacity-70 py-0' : 'opacity-100'}`}>
