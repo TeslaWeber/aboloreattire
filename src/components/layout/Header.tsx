@@ -175,7 +175,7 @@ const Header = () => {
             <div className="h-px bg-border/40" />
 
             {/* Bottom row - icon actions */}
-            <div className="flex items-center justify-center gap-10 py-3">
+            <div className={`flex items-center justify-center gap-10 transition-all duration-500 ease-in-out ${isCondensed ? 'py-1.5' : 'py-3'}`}>
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 text-foreground/60 hover:text-primary transition-colors duration-300"
