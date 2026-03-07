@@ -100,6 +100,10 @@
     font-family: 'Playfair Display', serif;
   }
 
+  .font-display {
+    font-family: 'Cormorant Garamond', serif !important;
+  }
+
   /* Ensure images don't overflow on mobile */
   img {
     max-width: 100%;
