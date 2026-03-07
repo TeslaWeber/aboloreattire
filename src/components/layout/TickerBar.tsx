@@ -1,26 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface TickerBarProps {
   isCondensed: boolean;
 }
 
-const DEFAULT_MESSAGE = "Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping";
+const DEFAULT_MESSAGES = ["Welcome to ABOLORE COUTURE — Thank you for choosing us — Enjoy your shopping"];
 
 const TickerBar = ({ isCondensed }: TickerBarProps) => {
   const [speed, setSpeed] = useState(60);
-  const [message, setMessage] = useState(DEFAULT_MESSAGE);
+  const [messages, setMessages] = useState<string[]>(DEFAULT_MESSAGES);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key, value")
-        .in("key", ["ticker_speed", "ticker_message"]);
+        .in("key", ["ticker_speed", "ticker_messages", "ticker_message"]);
       if (data) {
         data.forEach((row) => {
           if (row.key === "ticker_speed") setSpeed(Number(row.value));
-          if (row.key === "ticker_message") setMessage(row.value);
+          if (row.key === "ticker_messages") {
+            try {
+              const parsed = JSON.parse(row.value);
+              if (Array.isArray(parsed) && parsed.length > 0) setMessages(parsed);
+            } catch {}
+          }
         });
       }
     };
@@ -30,22 +37,48 @@ const TickerBar = ({ isCondensed }: TickerBarProps) => {
       .channel("ticker-settings")
       .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload: any) => {
         if (payload.new?.key === "ticker_speed") setSpeed(Number(payload.new.value));
-        if (payload.new?.key === "ticker_message") setMessage(payload.new.value);
+        if (payload.new?.key === "ticker_messages") {
+          try {
+            const parsed = JSON.parse(payload.new.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setMessages(parsed);
+              setCurrentIndex(0);
+            }
+          } catch {}
+        }
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
 
+  // Rotate messages every 8 seconds when there are multiple
+  useEffect(() => {
+    if (messages.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % messages.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [messages.length]);
+
+  const currentMessage = messages[currentIndex] || messages[0];
+
   return (
     <div className={`bg-primary text-primary-foreground overflow-hidden transition-all duration-500 ease-in-out ${isCondensed ? 'opacity-70 py-0' : 'opacity-100'}`}>
-      <div
-        className={`whitespace-nowrap text-[11px] tracking-widest uppercase font-light inline-flex transition-all duration-500 ${isCondensed ? 'py-1' : 'py-1.5'}`}
-        style={{ animation: `marquee ${speed}s linear infinite` }}
-      >
-        {[0, 1, 2, 3].map((i) => (
-          <span key={i} className="mx-8">{message}</span>
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.5 }}
+          className={`whitespace-nowrap text-[11px] tracking-widest uppercase font-light inline-flex transition-all duration-500 ${isCondensed ? 'py-1' : 'py-1.5'}`}
+          style={{ animation: `marquee ${speed}s linear infinite` }}
+        >
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className="mx-8">{currentMessage}</span>
+          ))}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
