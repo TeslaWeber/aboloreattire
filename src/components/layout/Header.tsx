@@ -208,7 +208,7 @@ const Header = () => {
             </div>
           </div>
 
-          <div className="flex lg:hidden items-center justify-between h-14 px-1">
+          <div className={`flex lg:hidden items-center justify-between px-1 transition-all duration-500 ease-in-out ${isCondensed ? 'h-11' : 'h-14'}`}>
             <div className="flex items-center shrink-0 -ml-2">
               <button
                 className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
