@@ -163,9 +163,9 @@ const Header = () => {
             <div className="h-px bg-border/40" />
 
             {/* Center row - brand name */}
-            <div className="flex items-center justify-center py-5">
+            <div className={`flex items-center justify-center transition-all duration-500 ease-in-out ${isCondensed ? 'py-2' : 'py-5'}`}>
               <Link to="/" className="group">
-                <h1 className="font-display text-3xl lg:text-4xl font-light tracking-[0.35em] uppercase luxury-text-gradient transition-opacity duration-300 group-hover:opacity-80">
+                <h1 className={`font-display font-light tracking-[0.35em] uppercase luxury-text-gradient transition-all duration-500 ease-in-out group-hover:opacity-80 ${isCondensed ? 'text-xl lg:text-2xl' : 'text-3xl lg:text-4xl'}`}>
                   ABOLORE COUTURE
                 </h1>
               </Link>
