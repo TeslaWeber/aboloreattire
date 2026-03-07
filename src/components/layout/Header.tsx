@@ -208,7 +208,7 @@ const Header = () => {
             </div>
           </div>
 
-          <div className="flex lg:hidden items-center justify-between h-14 px-1">
+          <div className={`flex lg:hidden items-center justify-between px-1 transition-all duration-500 ease-in-out ${isCondensed ? 'h-11' : 'h-14'}`}>
             <div className="flex items-center shrink-0 -ml-2">
               <button
                 className="relative p-2 text-foreground/70 hover:text-primary transition-colors duration-300"
@@ -240,7 +240,7 @@ const Header = () => {
             </div>
 
             <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-              <h1 className="font-display text-[14px] font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap">
+              <h1 className={`font-display font-light tracking-[0.2em] uppercase luxury-text-gradient whitespace-nowrap transition-all duration-500 ease-in-out ${isCondensed ? 'text-[12px]' : 'text-[14px]'}`}>
                 ABOLORE COUTURE
               </h1>
             </Link>
