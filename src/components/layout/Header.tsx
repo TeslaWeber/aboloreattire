@@ -243,12 +243,12 @@ const Header = () => {
           <SheetHeader className="px-6 pt-8 pb-6 border-b border-border/30">
             <SheetTitle className="text-left font-display text-base font-light tracking-[0.3em] uppercase luxury-text-gradient">ABOLORE COUTURE</SheetTitle>
           </SheetHeader>
-          <nav className="p-4 space-y-1">
+          <nav className="p-5 space-y-0.5">
             {user ? (
               <>
                 <Link
                   to="/account"
-                  className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                  className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   My Account
@@ -256,7 +256,7 @@ const Header = () => {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="relative block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                    className="relative block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setHasAdminNotification(false);
@@ -265,44 +265,50 @@ const Header = () => {
                   >
                     Admin Dashboard
                     {hasAdminNotification && (
-                      <span className="absolute top-3 right-3 h-2.5 w-2.5 bg-destructive rounded-full" />
+                      <span className="absolute top-3.5 right-4 h-2 w-2 bg-destructive rounded-full" />
                     )}
                   </Link>
                 )}
+                <Link
+                  to="/wishlist"
+                  className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Wishlist
+                </Link>
                 <button
                   onClick={() => { setIsMobileMenuOpen(false); setSignOutDialogOpen(true); }}
-                  className="block w-full text-left py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium"
+                  className="block w-full text-left py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300"
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/auth?mode=signin" className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/auth?mode=signin" className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300" onClick={() => setIsMobileMenuOpen(false)}>
                   Sign In
                 </Link>
-                <Link to="/auth?mode=signup" className="block py-3 px-3 text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/auth?mode=signup" className="block py-3 px-4 text-sm tracking-wide text-foreground/70 hover:text-primary hover:bg-muted/50 rounded-md transition-all duration-300" onClick={() => setIsMobileMenuOpen(false)}>
                   Create Account
                 </Link>
               </>
             )}
 
             {/* Features */}
-            <div className="pt-4 mt-4 border-t border-border space-y-1">
-              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
-                <Truck className="h-5 w-5 text-primary" />
+            <div className="pt-6 mt-6 border-t border-border/30 space-y-1">
+              <div className="flex items-center gap-3 py-2.5 px-4 text-foreground/50 text-xs tracking-wider uppercase">
+                <Truck className="h-4 w-4 text-primary/70" />
                 Swift & Safe Delivery
               </div>
-              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
-                <Shield className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-3 py-2.5 px-4 text-foreground/50 text-xs tracking-wider uppercase">
+                <Shield className="h-4 w-4 text-primary/70" />
                 Secure Payment
               </div>
-              <div className="flex items-center gap-3 py-3 px-3 text-foreground/80 text-sm">
-                <RefreshCw className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-3 py-2.5 px-4 text-foreground/50 text-xs tracking-wider uppercase">
+                <RefreshCw className="h-4 w-4 text-primary/70" />
                 Easy Returns
               </div>
             </div>
-
           </nav>
         </SheetContent>
       </Sheet>
