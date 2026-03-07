@@ -34,6 +34,13 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
+  const [isCondensed, setIsCondensed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsCondensed(window.scrollY > 40);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const { totalItems, setIsCartOpen } = useCart();
   const { totalItems: wishlistTotal } = useWishlist();
   const { user, signOut, isAdmin } = useAuth();
@@ -117,7 +124,7 @@ const Header = () => {
           {/* Desktop: Three-row premium layout */}
           <div className="hidden lg:block">
             {/* Top row - minimal nav links */}
-            <div className="flex items-center justify-between py-2 text-[11px] tracking-widest uppercase">
+            <div className={`flex items-center justify-between text-[11px] tracking-widest uppercase transition-all duration-500 ease-in-out ${isCondensed ? 'py-1' : 'py-2'}`}>
               <nav className="flex items-center gap-8">
                 <Link to="/products" className="text-muted-foreground hover:text-primary transition-colors duration-300">
                   Shop All
@@ -156,9 +163,9 @@ const Header = () => {
             <div className="h-px bg-border/40" />
 
             {/* Center row - brand name */}
-            <div className="flex items-center justify-center py-5">
+            <div className={`flex items-center justify-center transition-all duration-500 ease-in-out ${isCondensed ? 'py-2' : 'py-5'}`}>
               <Link to="/" className="group">
-                <h1 className="font-display text-3xl lg:text-4xl font-light tracking-[0.35em] uppercase luxury-text-gradient transition-opacity duration-300 group-hover:opacity-80">
+                <h1 className={`font-display font-light tracking-[0.35em] uppercase luxury-text-gradient transition-all duration-500 ease-in-out group-hover:opacity-80 ${isCondensed ? 'text-xl lg:text-2xl' : 'text-3xl lg:text-4xl'}`}>
                   ABOLORE COUTURE
                 </h1>
               </Link>
@@ -168,7 +175,7 @@ const Header = () => {
             <div className="h-px bg-border/40" />
 
             {/* Bottom row - icon actions */}
-            <div className="flex items-center justify-center gap-10 py-3">
+            <div className={`flex items-center justify-center gap-10 transition-all duration-500 ease-in-out ${isCondensed ? 'py-1.5' : 'py-3'}`}>
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 text-foreground/60 hover:text-primary transition-colors duration-300"
