@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import heroStreet1 from "@/assets/hero-street-1.jpg";
 import heroStreet2 from "@/assets/hero-street-2.jpg";
 import heroStreet3 from "@/assets/hero-street-3.jpg";
@@ -61,33 +61,92 @@ const heroImages = [
   heroStreet11, heroStreet12, heroStreet13, heroStreet14, heroStreet15,
 ];
 
+// Ken Burns effect presets — each gives a different slow zoom/pan direction
+const kenBurnsVariants = [
+  { scale: [1, 1.15], x: ["0%", "-3%"], y: ["0%", "-2%"] },   // zoom in, drift top-left
+  { scale: [1.1, 1], x: ["-2%", "2%"], y: ["-1%", "1%"] },    // zoom out, drift right
+  { scale: [1, 1.12], x: ["0%", "3%"], y: ["0%", "-3%"] },     // zoom in, drift top-right
+  { scale: [1.08, 1], x: ["2%", "-2%"], y: ["2%", "0%"] },     // zoom out, drift left
+  { scale: [1, 1.1], x: ["0%", "0%"], y: ["0%", "-4%"] },      // zoom in, pan up
+];
+
+const SWIPE_THRESHOLD = 50;
+
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const goToNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+  const startAutoPlay = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setDirection(1);
+      setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
   }, []);
 
+  const goToNext = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+    startAutoPlay(); // reset timer after manual interaction
+  }, [startAutoPlay]);
+
+  const goToPrev = useCallback(() => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+    startAutoPlay();
+  }, [startAutoPlay]);
+
   useEffect(() => {
-    const interval = setInterval(goToNext, 4000);
-    return () => clearInterval(interval);
-  }, [goToNext]);
+    startAutoPlay();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [startAutoPlay]);
+
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
+    if (info.offset.x < -SWIPE_THRESHOLD) {
+      goToNext();
+    } else if (info.offset.x > SWIPE_THRESHOLD) {
+      goToPrev();
+    }
+  };
+
+  const kenBurns = kenBurnsVariants[currentIndex % kenBurnsVariants.length];
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <AnimatePresence initial={false}>
+      {/* Swipe overlay — captures drag gestures */}
+      <motion.div
+        className="absolute inset-0 z-[5] cursor-grab active:cursor-grabbing"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.15}
+        onDragEnd={handleDragEnd}
+      />
+
+      <AnimatePresence initial={false} custom={direction}>
         <motion.img
           key={currentIndex}
           src={heroImages[currentIndex]}
           alt="Fashion Collection"
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
+          custom={direction}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+            scale: kenBurns.scale,
+            x: kenBurns.x,
+            y: kenBurns.y,
+          }}
           exit={{ opacity: 0 }}
-          transition={{ 
-            opacity: { duration: 1.2, ease: "easeInOut" },
-            scale: { duration: 6, ease: "easeOut" }
+          transition={{
+            opacity: { duration: 1, ease: "easeInOut" },
+            scale: { duration: 8, ease: "linear" },
+            x: { duration: 8, ease: "linear" },
+            y: { duration: 8, ease: "linear" },
           }}
           className="absolute inset-0 w-full h-full object-cover object-top"
+          draggable={false}
         />
       </AnimatePresence>
 
