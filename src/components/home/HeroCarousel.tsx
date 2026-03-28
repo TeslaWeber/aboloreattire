@@ -87,7 +87,7 @@ const HeroCarousel = () => {
             opacity: { duration: 1.2, ease: "easeInOut" },
             scale: { duration: 6, ease: "easeOut" }
           }}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-top"
         />
       </AnimatePresence>
 

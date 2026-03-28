@@ -58,7 +58,7 @@ const Index = () => {
       )}
 
       {/* Hero Section */}
-      <section className="relative h-[75vh] lg:h-[90vh] overflow-hidden">
+      <section className="relative h-[75vh] lg:h-[80vh] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30 z-10" />
         <HeroCarousel />
