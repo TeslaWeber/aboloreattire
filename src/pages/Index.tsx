@@ -148,7 +148,13 @@ const Index = () => {
       {/* Featured Products */}
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
-          <div className="flex items-end justify-between mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-50px" }}
+            className="flex items-end justify-between mb-10"
+          >
             <div>
               <p className="text-xs font-medium text-primary tracking-[0.2em] uppercase mb-3">Curated For You</p>
               <h2 className="font-display text-2xl lg:text-3xl font-bold">
@@ -158,7 +164,7 @@ const Index = () => {
             <Button asChild variant="ghost" className="text-primary hover:text-primary/80 hidden md:inline-flex">
               <Link to="/products">View All <ArrowRight className="ml-1 h-4 w-4" /></Link>
             </Button>
-          </div>
+          </motion.div>
           
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -183,10 +189,10 @@ const Index = () => {
               {featuredProducts.slice(0, visibleCount).map((product, i) => (
                 <motion.div
                   key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  viewport={{ once: true }}
+                  initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.5, delay: (i % 4) * 0.08, ease: "easeOut" }}
+                  viewport={{ once: true, margin: "-60px" }}
                   className="group"
                 >
                   <Link to={`/product/${product.id}`} className="block">
