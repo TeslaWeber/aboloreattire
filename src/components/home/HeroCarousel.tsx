@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { motion, AnimatePresence, PanInfo, useScroll, useTransform } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import heroStreet1 from "@/assets/hero-street-1.jpg";
 import heroStreet2 from "@/assets/hero-street-2.jpg";
 import heroStreet3 from "@/assets/hero-street-3.jpg";
