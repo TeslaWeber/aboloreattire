@@ -73,9 +73,15 @@ const kenBurnsVariants = [
 const SWIPE_THRESHOLD = 50;
 
 const HeroCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const randomStart = useMemo(() => Math.floor(Math.random() * heroImages.length), []);
+  const [currentIndex, setCurrentIndex] = useState(randomStart);
+  const [direction, setDirection] = useState(1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Parallax: translate image down as user scrolls
+  const { scrollY } = useScroll();
+  const parallaxY = useTransform(scrollY, [0, 600], [0, 120]);
 
   const startAutoPlay = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -115,7 +121,7 @@ const HeroCarousel = () => {
   const kenBurns = kenBurnsVariants[currentIndex % kenBurnsVariants.length];
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <motion.div ref={containerRef} className="absolute inset-0 overflow-hidden" style={{ y: parallaxY }}>
       {/* Swipe overlay — captures drag gestures */}
       <motion.div
         className="absolute inset-0 z-[5] cursor-grab active:cursor-grabbing"
@@ -150,6 +156,22 @@ const HeroCarousel = () => {
         />
       </AnimatePresence>
 
+      {/* Desktop arrow buttons */}
+      <button
+        onClick={goToPrev}
+        className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-background/40 backdrop-blur-sm text-foreground/80 hover:bg-background/70 transition-colors"
+        aria-label="Previous image"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <button
+        onClick={goToNext}
+        className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-background/40 backdrop-blur-sm text-foreground/80 hover:bg-background/70 transition-colors"
+        aria-label="Next image"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+
       {/* Progress bar */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-1">
         {Array.from({ length: Math.min(10, heroImages.length) }).map((_, i) => {
@@ -166,7 +188,7 @@ const HeroCarousel = () => {
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -55,7 +55,7 @@ const PaymentSuccess = () => {
         <p className="text-sm text-muted-foreground mb-6">Reference: {reference}</p>
       )}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Button asChild><Link to="/products"><ShoppingBag className="mr-2 h-4 w-4" />Back to Shopping</Link></Button>
+        <Button asChild><Link to="/"><ShoppingBag className="mr-2 h-4 w-4" />Continue Shopping</Link></Button>
         <Button variant="outline" asChild><Link to="/account">View Orders</Link></Button>
       </div>
     </div>
